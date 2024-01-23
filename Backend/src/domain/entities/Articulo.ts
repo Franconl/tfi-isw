@@ -1,4 +1,4 @@
-export class ArticuloEntity {
+export class Articulo {
     private codigo: string;
     private descripcion: string;
     private costo: number;

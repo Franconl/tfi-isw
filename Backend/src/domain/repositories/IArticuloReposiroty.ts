@@ -1,7 +1,7 @@
-import { ArticuloEntity } from "../entities/ArticuloEntity";
+import { Articulo } from "../entities/Articulo";
 
 export interface IArticuloRepository {
-  findArticuloByCodigo(codigo: string): Promise<ArticuloEntity | null>;
-  registerArticulo(articulo: ArticuloEntity): Promise<ArticuloEntity | null>;
-  listArticulos(): Promise<ArticuloEntity[]>;
+  findArticuloByCodigo(codigo: string): Promise<Articulo | null>;
+  registerArticulo(articulo: Articulo): Promise<Articulo | null>;
+  listArticulos(): Promise<Articulo[]>;
 }
