@@ -1,24 +1,24 @@
-import { Articulo } from "./Articulo";
+import { Inventario } from "./Inventario";
 
 export class LineaDeVenta {
-  private articulo: Articulo;
+  private inventario : Inventario;
   private cantidad: number;
   private precioUnitario: number;
 
-  constructor(articulo: Articulo, cantidad: number, precioUnitario: number) {
-    this.articulo = articulo;
+  constructor(inventario: Inventario, cantidad: number, precioUnitario: number) {
+    this.inventario = inventario;
     this.cantidad = cantidad;
     this.precioUnitario = precioUnitario;
   }
 
   // Getter para artículo
-  getArticulo(): Articulo {
-    return this.articulo;
+  getInventario(): Inventario {
+    return this.inventario;
   }
 
   // Setter para artículo
-  setArticulo(articulo: Articulo): void {
-    this.articulo = articulo;
+  setArticulo(inventario: Inventario): void {
+    this.inventario = inventario;
   }
 
   // Getter para cantidad

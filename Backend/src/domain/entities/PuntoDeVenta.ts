@@ -1,10 +1,14 @@
+import { Sucursal } from "./Sucursal";
+
 export class PuntoDeVenta {
     private numero: number;
     private estado: string;
+    private sucursal : Sucursal;
   
-    constructor(numero: number) {
+    constructor(numero: number,sucursal : Sucursal) {
       this.numero = numero;
       this.estado = "disponible";
+      this.sucursal = sucursal;
     }
   
     // Getter para número

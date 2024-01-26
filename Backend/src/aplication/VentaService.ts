@@ -2,21 +2,30 @@ import { Venta } from "../domain/entities/Venta";
 import { Cliente } from "../domain/entities/Cliente";
 import { CondicionTributaria } from "../domain/entities/CondicionTributaria";
 import { TipoDeComprobante } from "../domain/entities/TipoDeComprobante";
-import { Usuario } from "../domain/entities/Usuario"
-import { IBusquedaClienteService } from "./IBusquedaClienteService";
+import { Usuario } from "../domain/entities/Usuario";
+import { IClienteRepository } from "../domain/repositories/IClienteRepository";
+import { Articulo } from "../domain/entities/Articulo";
+import { IArticuloRepository } from "../domain/repositories/IArticuloReposiroty";
+import { Sesion } from "../domain/entities/Sesion";
 
 export class VentaService {
-  private servicioBusquedaClientes: IBusquedaClienteService;
+  private clienteRepository: IClienteRepository;
+  private articuloRepository: IArticuloRepository;
+  private sesion : Sesion;
 
-  constructor(servicioBusquedaClientes: IBusquedaClienteService) {
-    this.servicioBusquedaClientes = servicioBusquedaClientes;
+  constructor(clienteRepository: IClienteRepository, articuloRepository : IArticuloRepository, sesion : Sesion) {
+    this.clienteRepository = clienteRepository;
+    this.articuloRepository = articuloRepository;
+    this.sesion = sesion;
   }
-  // Otros métodos del servicio
 
-  public crearNuevaVenta(usuario: Usuario, cliente : Cliente, condicionTributariaEmpresa: CondicionTributaria): Venta {
+  public crearNuevaVenta( cliente : Cliente, condicionTributariaEmpresa: CondicionTributaria): Venta {
     // Crear una nueva venta
+    
+    const usuario = this.sesion.getUsuario();
+    const puntoDeVenta = this.sesion.getPuntoDeVenta();
 
-    const nuevaVenta = new Venta(usuario, cliente);
+    const nuevaVenta = new Venta(usuario, cliente,puntoDeVenta);
 
     // Determinar el tipo de comprobante según la condición tributaria del cliente y la empresa
     const tipoDeComprobante = this.determinarTipoDeComprobante(cliente.getCondicionTributaria(), condicionTributariaEmpresa);
@@ -41,8 +50,18 @@ export class VentaService {
         case CondicionTributaria.MONOTRIBUTO:
           tipo = TipoDeComprobante.FACTURA_A;
           break;
+        case CondicionTributaria.EXENTO:
+          tipo = TipoDeComprobante.FACTURA_B;
+          break;
+        case CondicionTributaria.NO_RESPONSABLE:
+          tipo = TipoDeComprobante.FACTURA_B;
+          break;
+        case CondicionTributaria.RESPONSABLE_INSCRIPTO:
+          tipo = TipoDeComprobante.FACTURA_A;
+          break;
       }
-    }
+    } else {console.error('error al obtener la condicion tributaria de la tienda')}
     return tipo;
   }
+
 }

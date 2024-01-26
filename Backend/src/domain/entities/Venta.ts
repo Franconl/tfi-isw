@@ -4,24 +4,33 @@ import { PuntoDeVenta } from "../entities/PuntoDeVenta";
 import { LineaDeVenta } from "../entities/LineaDeVenta";
 //import { Pago } from "../entities/Pago";
 import { Cliente } from "../entities/Cliente";
+import { v4 as uuid } from "uuid";
+import { Articulo } from "./Articulo";
 
 export class Venta {
+  private id: string;
   private fecha: Date;
   private monto!: number;
   private estado: string;
   private tipoDeComprobante!: TipoDeComprobante;
   private usuario: Usuario;
-  //private puntoDeVenta: PuntoDeVenta;
+  private puntoDeVenta: PuntoDeVenta;
   private lineasDeVenta: LineaDeVenta[];
   //private pago: Pago;
   private cliente: Cliente;
 
-  constructor(usuario: Usuario, cliente: Cliente) {
+  constructor(usuario: Usuario, cliente: Cliente, puntoDeVenta : PuntoDeVenta) {
+    this.puntoDeVenta = puntoDeVenta;
+    this.id = uuid();
     this.fecha = new Date();
     this.usuario = usuario;
     this.cliente = cliente;
     this.lineasDeVenta = [];
     this.estado = "Pendiente";
+  }
+
+  getFecha() : Date {
+    return this.fecha;
   }
 
   // Getter y setter para monto
@@ -68,5 +77,30 @@ export class Venta {
   //setter cliente
   setCliente(cliente: Cliente): void {
     this.cliente = cliente;
+  }
+
+
+  getImporteIva() : number {
+    let sum = 0;
+    this.lineasDeVenta.forEach(lineaDeVenta => {
+      sum =+ (lineaDeVenta.getInventario().getArticulo().obtenerMontoIVA()) * lineaDeVenta.getCantidad();
+    });
+
+    return sum;
+  }
+
+  getImporteNeto() : number{
+    let sum = 0;
+    this.lineasDeVenta.forEach(lineaDeVenta => {
+      sum =+ (lineaDeVenta.getInventario().getArticulo().obtenerMontoNeto()) * lineaDeVenta.getCantidad();
+    });
+
+    return sum;
+  }
+
+  getImporteTotal() : number {
+    let sum = this.getImporteIva() + this.getImporteNeto();
+
+    return sum;
   }
 }
