@@ -1,12 +1,12 @@
-import { Cliente } from "../domain/entities/Cliente";
-import { IBusquedaClienteService } from "../aplication/IBusquedaClienteService"
+/*import { Cliente } from "../domain/entities/Cliente";
+import { IClienteRepository } from "../domain/repositories/IClienteRepository";
 
-class ServicioBusquedaClientesMock implements IBusquedaClienteService {
+class ServicioBusquedaClientesMock implements IClienteRepository {
   private clientes: Cliente[];
 
   constructor() {
     this.clientes = [
-      new Cliente("Generico", "-", "-", "-", "-", "11111111"),
+      new Cliente("Generico", "-", "-", "-", "-", {"11111111"}),
       new Cliente("Jane", "Smith", "987654321", "jane.smith@example.com", "456 Oak St", "98765432"),
       // Agrega más instancias de Cliente según sea necesario
     ];
@@ -21,6 +21,7 @@ class ServicioBusquedaClientesMock implements IBusquedaClienteService {
     // Devolver el primer cliente encontrado o null si no hay resultados
     return clientesEncontrados.length > 0 ? clientesEncontrados[0] : null;
   }
+
 }
 
-export default ServicioBusquedaClientesMock;
+export default ServicioBusquedaClientesMock; */

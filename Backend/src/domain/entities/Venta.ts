@@ -6,6 +6,7 @@ import { LineaDeVenta } from "../entities/LineaDeVenta";
 import { Cliente } from "../entities/Cliente";
 import { v4 as uuid } from "uuid";
 import { Articulo } from "./Articulo";
+import { Comprobante } from "./Comprobante";
 
 export class Venta {
   private id: string;
@@ -18,6 +19,7 @@ export class Venta {
   private lineasDeVenta: LineaDeVenta[];
   //private pago: Pago;
   private cliente: Cliente;
+  private comprobante! : Comprobante;
 
   constructor(usuario: Usuario, cliente: Cliente, puntoDeVenta : PuntoDeVenta) {
     this.puntoDeVenta = puntoDeVenta;
@@ -27,6 +29,7 @@ export class Venta {
     this.cliente = cliente;
     this.lineasDeVenta = [];
     this.estado = "Pendiente";
+
   }
 
   getFecha() : Date {
@@ -102,5 +105,9 @@ export class Venta {
     let sum = this.getImporteIva() + this.getImporteNeto();
 
     return sum;
+  }
+
+  setComprobante(comprobante : Comprobante){
+    this.comprobante = comprobante;
   }
 }

@@ -8,18 +8,29 @@ export class Cliente {
   private telefono: string;
   private email: string;
   private domicilio: string;
-  private dni: string;
+  private dni?: number;
   private condicion!: CondicionTributaria;
+  private cuil? : number;
+  private cuit? : number;
 
-  constructor(nombre: string, apellido: string, telefono: string, email: string, domicilio: string, dni: string) {
+  constructor(nombre: string, apellido: string, telefono: string, email: string,
+     domicilio: string,options:{dni : number, cuil : number , cuit : number}) {
     this.id = uuid();
     this.nombre = nombre;
     this.apellido = apellido;
     this.telefono = telefono;
     this.email = email;
     this.domicilio = domicilio;
-    this.dni = dni;
+    if(!options.dni && !options.cuil && !options.cuit){
+      throw new Error('No se proporciono documento')
+    }
+    this.cuil;
+    this.cuit;
+    this.dni;
+
   }
+
+  
 
   // Getter para nombre
   getNombre(): string {
@@ -72,12 +83,12 @@ export class Cliente {
   }
 
   // Getter para dni
-  getDni(): string {
+  getDni(): any {
     return this.dni;
   }
 
   // Setter para dni
-  setDni(dni: string): void {
+  setDni(dni: number): void {
     this.dni = dni;
   }
   //Setter Condicion
@@ -88,4 +99,22 @@ export class Cliente {
   getCondicionTributaria(): CondicionTributaria {
     return this.condicion;
   }
+
+  setCuit(cuit : number) : void {
+    this.cuil = cuit;
+  }
+
+  getCuit() : any {
+    return this.cuit;
+  }
+
+  setCuil(cuil : number) : void {
+    this.cuil = cuil;
+  }
+
+  getCuil() : any {
+    return this.cuit;
+  }
+
+
 }
