@@ -1,0 +1,16 @@
+################################################################################
+# Los Archivos con extensión http son interpretados por la extensión REST Client
+################################################################################
+
+# Variable con la URL base
+@BASE_API=http://localhost:3001/api
+
+### http://tu-servidor.com/inicio?user=nombre_usuario&pass=contrasena&sucursal=sucursal_nombre&puntoDeVenta=123
+
+POST {{BASE_API}}/?user=pepe&pass=1234&sucursal=1&puntoDeVenta=1
+
+
+
+### Buscar Articulo
+
+POST {{BASE_API}}/venta?dni=1234

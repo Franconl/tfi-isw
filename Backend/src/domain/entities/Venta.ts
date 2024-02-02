@@ -5,7 +5,6 @@ import { LineaDeVenta } from "../entities/LineaDeVenta";
 //import { Pago } from "../entities/Pago";
 import { Cliente } from "../entities/Cliente";
 import { v4 as uuid } from "uuid";
-import { Articulo } from "./Articulo";
 import { Comprobante } from "./Comprobante";
 
 export class Venta {

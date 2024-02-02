@@ -1,3 +1,4 @@
+import { PuntoDeVenta } from "../domain/entities/PuntoDeVenta";
 import { Sucursal } from "../domain/entities/Sucursal";
 import { Usuario } from "../domain/entities/Usuario";
 import { IClienteRepository } from "../domain/repositories/IClienteRepository";
@@ -11,17 +12,17 @@ export class AuthService{
 
     constructor(repoUsuario : IUsuarioRepository, repoSucursal : ISucursalRepository){
         this.repositoryUsuario = repoUsuario;
-        this.repositorySucursal = repoSucursal
+        this.repositorySucursal = repoSucursal;
     }
 
-    public async authUser(us : string , pass : string) : Promise<boolean>{
+    public async authUser(us : string , pass : string) : Promise<Usuario | null>{
         try{
             const usuario = await this.repositoryUsuario.authUsuario({us , pass});
-            if(usuario) return true;
-            else return false;
+            if(usuario) return usuario;
+            else return null;
         }catch(error){
             console.error('error al autentificar usuario', error);
-            return false;
+            return null;
         }
     }
 
@@ -31,6 +32,16 @@ export class AuthService{
             return sucursal;
         }catch(error){
             console.error('error al obtener sucursal', error);
+            return null;
+        }
+    }
+
+    public async getPuntoDeVenta(numero : number) : Promise<PuntoDeVenta | null>{
+        try{
+            const puntoDeVenta = await this.repositorySucursal.getPuntoDeVenta({numero});
+            return puntoDeVenta;
+        }catch(error){
+            console.error('error al obtener puntoDeVenta', error);
             return null;
         }
     }

@@ -1,17 +1,15 @@
-import express from 'express';
-import bodyParser from 'body-parser';
-import routes from './infrastructure/routes/Routes';
+import "dotenv/config";
+import express from "express";
+import cors from "express";
+import ventaRoute from "./infrastructure/routes/venta.routes";
+import authRoute from "./infrastructure/routes/auth.routes"
 
 const app = express();
+app.use(cors());
+app.use(express.json());
 
-// Configuraciones generales
-app.use(bodyParser.json());
+const port = process.env.PORT || 3001;
 
-// Configurar rutas
-app.use('/api', routes);
-
-// Iniciar el servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor iniciado en el puerto ${PORT}`);
-});
+app.use('/api', authRoute);
+app.use('/api' , ventaRoute);
+app.listen(port, () => console.log(`USER, Listo por el puerto ${port}`));

@@ -22,9 +22,14 @@ export class VentaService {
     this.sesion = sesion;
   }
 
-  public async crearNuevaVenta( dni : number, condicionTributariaEmpresa: CondicionTributaria): Promise<Venta | void>{
+  public setSesion(sesion : Sesion){
+    this.sesion = sesion;
+  }
+
+  public async crearNuevaVenta( dni : number): Promise<Venta | void>{
     // Crear una nueva venta
     try{
+      console.log("sesion: ", this.sesion);
       const cliente = await this.clienteRepository.buscarCliente({dni});
 
       if(cliente){
@@ -35,6 +40,7 @@ export class VentaService {
         this.venta = nuevaVenta;
 
         // Determinar el tipo de comprobante según la condición tributaria del cliente y la empresa
+        const condicionTributariaEmpresa : CondicionTributaria = CondicionTributaria.RESPONSABLE_INSCRIPTO; 
         const tipoDeComprobante = this.determinarTipoDeComprobante(cliente.getCondicionTributaria(), condicionTributariaEmpresa);
 
         // Asignar el tipo de comprobante a la venta
@@ -81,25 +87,29 @@ export class VentaService {
     this.venta.agregarLineaDeVenta(lineadeVenta);
   }
 
-  public async buscarArticulo(codigo : string) : Promise<Inventario[]>{
+  public async buscarArticulo(codigo : string) : Promise<Inventario[] | null>{
     try{
+      console.log('llega hasta aca')
       const articulo = await this.articuloRepository.buscarArticulo({codigo});
 
       if(articulo){
         try{
-          const inventario : Inventario[] = await this.articuloRepository.buscarInventario({articulo});
-          return inventario;
+          const inventario : Inventario[] | null = await this.articuloRepository.buscarInventario({articulo});
+          if (inventario){
+            return inventario;
+          }else return null;
+
         }catch(error){
           console.error('error al buscar inventario',error);
-          return [];
+          return null;
         }
       } else{
         console.warn('No se encontro articulo con ese codigo');
-        return [];
+        return null;
       }
     }catch(error){
       console.error('error al buscar el articulo', error);
-      return [];
+      return null;
     }
   }
   
