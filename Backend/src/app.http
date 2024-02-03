@@ -11,6 +11,15 @@ POST {{BASE_API}}/?user=pepe&pass=1234&sucursal=1&puntoDeVenta=1
 
 
 
-### Buscar Articulo
+### Crear Venta
 
 POST {{BASE_API}}/venta?dni=1234
+
+
+### Buscar Articulo
+
+GET {{BASE_API}}/articulo?=1234
+
+### Seleccionar Articulo
+POST {{BASE_API}}/venta/inventario?cantidad=1?inventario=1234
+Content-Type: application/json

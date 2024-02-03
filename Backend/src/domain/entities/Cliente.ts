@@ -13,21 +13,16 @@ export class Cliente {
   private cuil? : number;
   private cuit? : number;
 
-  constructor(nombre: string, apellido: string, telefono: string, email: string,
-     domicilio: string,options:{dni : number, cuil : number , cuit : number}) {
+  constructor(nombre: string, apellido: string, telefono: string, email: string, domicilio: string, options: { dni?: number; cuil?: number; cuit?: number }) {
     this.id = uuid();
     this.nombre = nombre;
     this.apellido = apellido;
     this.telefono = telefono;
     this.email = email;
     this.domicilio = domicilio;
-    if(!options.dni && !options.cuil && !options.cuit){
-      throw new Error('No se proporciono documento')
-    }
-    this.cuil;
-    this.cuit;
-    this.dni;
-
+    this.dni = options.dni; 
+    this.cuil = options.cuil;  
+    this.cuit = options.cuit;
   }
 
   

@@ -26,12 +26,10 @@ export class VentaService {
     this.sesion = sesion;
   }
 
-  public async crearNuevaVenta( dni : number): Promise<Venta | void>{
+  public async crearNuevaVenta( dni : number): Promise<Venta | null>{
     // Crear una nueva venta
     try{
-      console.log("sesion: ", this.sesion);
       const cliente = await this.clienteRepository.buscarCliente({dni});
-
       if(cliente){
         const usuario = this.sesion.getUsuario();
         const puntoDeVenta = this.sesion.getPuntoDeVenta();
@@ -47,9 +45,13 @@ export class VentaService {
         nuevaVenta.setTipoDeComprobante(tipoDeComprobante);
 
         return nuevaVenta;
+      }else{
+        console.error('Cliente no encontrado');
+        return null;
       }
     }catch(error){
-      console.error('DNI de cliente no registrado');
+      console.error('error al buscar cliente');
+      return null;
     }
   }
 
@@ -58,7 +60,7 @@ export class VentaService {
 
     var tipo : TipoDeComprobante = TipoDeComprobante.FACTURA_B;
 
-    if(condicionTributariaEmpresa === CondicionTributaria.RESPONSABLE_INSCRIPTO){
+    if(condicionTributariaEmpresa == CondicionTributaria.RESPONSABLE_INSCRIPTO){
 
       switch(condicionTributariaCliente){
         case CondicionTributaria.CONSUMIDOR_FINAL:
@@ -81,15 +83,22 @@ export class VentaService {
     return tipo;
   }
   
-  public seleccionarArticulo(inventario : Inventario, cantidad : number) : void{
-    const precio = inventario.getArticulo().obtenerMontoTotal();
-    const lineadeVenta = new LineaDeVenta(inventario, cantidad, precio);
-    this.venta.agregarLineaDeVenta(lineadeVenta);
+  public async seleccionarArticulo(id : string, cantidad : number){
+    try{ 
+      const inventario = await this.articuloRepository.busarInventarioId({id});
+      if(inventario){
+        const precio = inventario.getArticulo().obtenerMontoTotal();
+        const lineadeVenta = new LineaDeVenta(inventario, cantidad, precio);
+        this.venta.agregarLineaDeVenta(lineadeVenta);
+      }
+    }catch(error){
+      throw error;
+    }
   }
 
   public async buscarArticulo(codigo : string) : Promise<Inventario[] | null>{
     try{
-      console.log('llega hasta aca')
+      
       const articulo = await this.articuloRepository.buscarArticulo({codigo});
 
       if(articulo){
@@ -97,7 +106,10 @@ export class VentaService {
           const inventario : Inventario[] | null = await this.articuloRepository.buscarInventario({articulo});
           if (inventario){
             return inventario;
-          }else return null;
+          }else{
+            console.error('No se encontro inventario');
+            return null;
+          } 
 
         }catch(error){
           console.error('error al buscar inventario',error);
