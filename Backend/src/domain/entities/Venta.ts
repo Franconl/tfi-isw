@@ -72,6 +72,11 @@ export class Venta {
   agregarLineaDeVenta(lineaDeVenta: LineaDeVenta): void {
     this.lineasDeVenta.push(lineaDeVenta);
   }
+
+  getLineaDeVenta() : LineaDeVenta[]{
+    return this.lineasDeVenta;
+  }
+
   //getter cliente
   getCliente(): Cliente {
     return this.cliente;

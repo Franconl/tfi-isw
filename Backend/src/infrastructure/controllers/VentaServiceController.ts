@@ -2,6 +2,7 @@ import { VentaService } from "../../aplication/VentaService";
 import { Request, Response } from "express";
 import { Inventario } from "../../domain/entities/Inventario";
 import { Venta } from "../../domain/entities/Venta";
+import { LineaDeVenta } from "../../domain/entities/LineaDeVenta";
 
 export class VentaServiceController{
     private ventaService : VentaService;
@@ -46,19 +47,20 @@ export class VentaServiceController{
         
     }
 
-    public seleccionarArticulo(req: Request, res: Response) {
+    public async seleccionarArticulo(req: Request, res: Response) : Promise<LineaDeVenta[] | null>{
         try {
-            const inventarioId = req.query.inventario as string;
+
+            const inventarioId = req.query.id as string;
             const cantidad: number = parseInt(req.query.cantidad as string);
 
-            this.ventaService.seleccionarArticulo(inventarioId, cantidad);
-    
-            // Responder con éxito
-            res.status(200).json({ mensaje: 'Artículo seleccionado exitosamente' });
+            const ldv = await this.ventaService.seleccionarArticulo(inventarioId, cantidad);
+            console.log(ldv)
+            return ldv;
         } catch (error) {
             // Manejar el error y responder con un mensaje de error
             console.error('Error al seleccionar el artículo:', error);
             res.status(500).json({ mensaje: 'Error interno del servidor' });
+            return null;
         }
     }
       

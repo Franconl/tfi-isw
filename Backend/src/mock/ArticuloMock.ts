@@ -9,45 +9,43 @@ import { TipoDeTalle } from "../domain/entities/TipoDeTalle";
 import { IArticuloRepository } from "../domain/repositories/IArticuloReposiroty";
 
 export class ArticuloMock implements IArticuloRepository{
-    
+    private articulo : Articulo[];
+    private inventario : Inventario[];
 
-    buscarArticulo(criterios: { codigo?: string }): Promise<Articulo | null> {
+    constructor(){
         const tipoDeTalle = new TipoDeTalle('1234', 'EU');
         const categoria = new Categoria('1234', 'Remera');
         const marca = new Marca('123', 'nike');
-        const articulo = new Articulo('1234', 'remera azul', 200, 23, tipoDeTalle, categoria, marca);
+        const articulo1 = new Articulo('1234', 'remera azul', 200, 23, tipoDeTalle, categoria, marca);
+
+        this.articulo = [articulo1]
+
+        const talle = new Talle('23', tipoDeTalle);
+        const color = new Color('1234', 'rojo');
+        const sucursal = new Sucursal('1234', 'centro', 'concepcion', 1234);
+     
+        this.inventario = [new Inventario(2, articulo1 , talle, color, sucursal)];
+    }
+
+    buscarArticulo(criterios: { codigo?: string }): Promise<Articulo | null> {
+        
     
-        if (criterios.codigo = articulo.getCodigo()) {
-            // Si hay un código en los criterios y coincide con el código del artículo
-            return Promise.resolve(articulo);
+        if (criterios.codigo = this.articulo[0].getCodigo()) {
+            return Promise.resolve(this.articulo[0]);
         } else {
             return Promise.resolve(null);
         }
     }
     
     buscarInventario(criterios: { articulo: Articulo }): Promise<Inventario[] | null> {
-        const tipoDeTalle: TipoDeTalle = new TipoDeTalle('1234', 'EU');
-        const talle = new Talle('23', tipoDeTalle);
-        const color = new Color('1234', 'rojo');
-        const sucursal = new Sucursal('1234', 'centro', 'concepcion', 1234);
-     
-        const inventario: Inventario[] = [new Inventario(2, criterios.articulo, talle, color, sucursal)];
+        
     
-        return Promise.resolve(inventario);
+        return Promise.resolve(this.inventario);
     }
     
     busarInventarioId(criterios: { id: string; }): Promise<Inventario | null> {
-        const tipoDeTalle: TipoDeTalle = new TipoDeTalle('1234', 'EU');
-        const talle = new Talle('23', tipoDeTalle);
-        const color = new Color('1234', 'rojo');
-        const sucursal = new Sucursal('1234', 'centro', 'concepcion', 1234);
-
-        const categoria = new Categoria('1234', 'Remera');
-        const marca = new Marca('123', 'nike');
-        const articulo = new Articulo('1234', 'remera azul', 200, 23, tipoDeTalle, categoria, marca);
-     
-        const inventario: Inventario = new Inventario(2, articulo , talle, color, sucursal);
-    
-        return Promise.resolve(inventario);
+        if(criterios.id = this.inventario[0].getId()){
+            return Promise.resolve(this.inventario[0]);
+        }else return Promise.resolve(null);
     }
 }

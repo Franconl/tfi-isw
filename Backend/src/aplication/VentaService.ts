@@ -83,13 +83,22 @@ export class VentaService {
     return tipo;
   }
   
-  public async seleccionarArticulo(id : string, cantidad : number){
+  public async seleccionarArticulo(id : string, cantidad : number) : Promise<LineaDeVenta[] | null>{
     try{ 
       const inventario = await this.articuloRepository.busarInventarioId({id});
-      if(inventario){
+      if(inventario && inventario.getCantidad() > 0){
+        
         const precio = inventario.getArticulo().obtenerMontoTotal();
         const lineadeVenta = new LineaDeVenta(inventario, cantidad, precio);
+
         this.venta.agregarLineaDeVenta(lineadeVenta);
+
+        inventario.setCantidad(inventario.getCantidad() - 1);
+
+        return this.venta.getLineaDeVenta();
+      }else{
+        console.error('error: inventario invalido o sin stock');
+        return null;
       }
     }catch(error){
       throw error;

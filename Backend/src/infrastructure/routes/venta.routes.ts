@@ -36,9 +36,12 @@ var ventaCtrl : VentaServiceController;
   });
 
   router.post('/venta/inventario', async (req, res) => {
-      const response = ventaCtrl.seleccionarArticulo(req,res);
-      res.status(200).send(response);
-    
+    try{ 
+        const response = await ventaCtrl.seleccionarArticulo(req,res);
+        res.status(200).send(response);
+    }catch(error) {
+      res.status(500).json({ mensaje: 'Error interno del servidor' });
+    }
   })
 
 

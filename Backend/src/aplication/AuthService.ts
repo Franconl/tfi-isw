@@ -39,7 +39,16 @@ export class AuthService{
     public async getPuntoDeVenta(numero : number) : Promise<PuntoDeVenta | null>{
         try{
             const puntoDeVenta = await this.repositorySucursal.getPuntoDeVenta({numero});
-            return puntoDeVenta;
+
+            if(puntoDeVenta && puntoDeVenta.getEstado() == "disponible"){
+
+                puntoDeVenta.setEstado("ocupado");
+                return puntoDeVenta;
+            }else{
+                console.error("punto de venta ocupado");
+                return null;
+            }
+
         }catch(error){
             console.error('error al obtener puntoDeVenta', error);
             return null;

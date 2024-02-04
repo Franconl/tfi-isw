@@ -21,5 +21,6 @@ POST {{BASE_API}}/venta?dni=1234
 GET {{BASE_API}}/articulo?=1234
 
 ### Seleccionar Articulo
-POST {{BASE_API}}/venta/inventario?cantidad=1?inventario=1234
+POST {{BASE_API}}/venta/inventario?cantidad=1?id=3297b322-2331-4b27-b6d0-a6d668c9fe2d
 Content-Type: application/json
+
