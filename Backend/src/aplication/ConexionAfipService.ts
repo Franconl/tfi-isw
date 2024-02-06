@@ -1,4 +1,4 @@
-import axios from "axios";
+/*import axios from "axios";
 import { Venta } from "../domain/entities/Venta";
 import { TipoDeComprobante } from "../domain/entities/TipoDeComprobante";
 import { Sesion } from "../domain/entities/Sesion";
@@ -14,6 +14,10 @@ export class ConexionAfipService {
         this.codigo = codigo;
         this.sesion = sesion;
         this.venta = venta;
+    }
+
+    getSesion() : Sesion {
+      return this.sesion;
     }
     
     public async solicitarToken() : Promise<any> {
@@ -184,4 +188,4 @@ export class ConexionAfipService {
       return this.venta.getImporteTotal() > 0;
     }
 }
-    
+*/

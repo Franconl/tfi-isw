@@ -31,6 +31,10 @@ export class Venta {
 
   }
 
+  getId() : string{
+    return this.id;
+  }
+
   getFecha() : Date {
     return this.fecha;
   }

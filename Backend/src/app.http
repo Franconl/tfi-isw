@@ -39,3 +39,6 @@ Content-Type: application/json
 "number": "25123456"
 }
 }
+
+### Confirmar pago tarjeta
+POST {{BASE_API}}/venta/tarjeta?monto=2000

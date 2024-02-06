@@ -24,10 +24,10 @@ export class AuthController {
       const sucursal = await this.authService.getSucursal(sucursalParam);
       const puntoDeVenta = await this.authService.getPuntoDeVenta(puntoDeVentaParam);
 
-      if (user && sucursal && puntoDeVenta) {
+      if (user && sucursal && puntoDeVenta && puntoDeVenta.getEstado() == "disponible") {
 
         const sesion = this.crearSesion(user, sucursal, puntoDeVenta);
-        
+        puntoDeVenta.setEstado("ocupado");
         return sesion;
       } else {
 

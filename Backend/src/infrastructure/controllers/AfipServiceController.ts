@@ -1,4 +1,4 @@
-import { ConexionAfipService } from "../../aplication/ConexionAfipService";
+/*import { ConexionAfipService } from "../../aplication/ConexionAfipService";
 
 export class AfipServiceController {
 
@@ -34,3 +34,5 @@ export class AfipServiceController {
           }
     }
 }
+
+*/

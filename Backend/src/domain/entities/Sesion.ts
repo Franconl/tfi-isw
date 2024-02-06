@@ -1,7 +1,7 @@
 import { PuntoDeVenta } from "./PuntoDeVenta";
 import { Sucursal } from "./Sucursal";
 import { Usuario } from "./Usuario";
-import { ConexionAfipService } from "../../aplication/ConexionAfipService";
+//import { ConexionAfipService } from "../../aplication/ConexionAfipService";
 
 export class Sesion{
 

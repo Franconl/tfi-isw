@@ -9,7 +9,7 @@ import { IArticuloRepository } from "../domain/repositories/IArticuloReposiroty"
 import { Sesion } from "../domain/entities/Sesion";
 import { Inventario } from "../domain/entities/Inventario";
 import { LineaDeVenta } from "../domain/entities/LineaDeVenta";
-import { ConexionAfipService } from "./ConexionAfipService";
+//import { ConexionAfipService } from "./ConexionAfipService";
 import { Sucursal } from "../domain/entities/Sucursal";
 
 export class VentaService {
@@ -146,4 +146,8 @@ export class VentaService {
     }
   }
   
+  public async finalizarVenta(){
+    
+  }
+
 }
