@@ -30,6 +30,7 @@ export class VentaServiceController{
 
     public async buscarArticulo(req: Request, res: Response) : Promise<Inventario[] | null>{
         const codigo = req.query.codigo as string;
+        const sucursalId = req.query.sucursal as string
         try{
             const inventario = await this.ventaService.buscarArticulo(codigo);
             if(inventario){
@@ -54,7 +55,6 @@ export class VentaServiceController{
             const cantidad: number = parseInt(req.query.cantidad as string);
 
             const ldv = await this.ventaService.seleccionarArticulo(inventarioId, cantidad);
-            console.log(ldv)
             return ldv;
         } catch (error) {
             // Manejar el error y responder con un mensaje de error

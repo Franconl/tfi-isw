@@ -9,6 +9,8 @@ import { IArticuloRepository } from "../domain/repositories/IArticuloReposiroty"
 import { Sesion } from "../domain/entities/Sesion";
 import { Inventario } from "../domain/entities/Inventario";
 import { LineaDeVenta } from "../domain/entities/LineaDeVenta";
+import { ConexionAfipService } from "./ConexionAfipService";
+import { Sucursal } from "../domain/entities/Sucursal";
 
 export class VentaService {
   private clienteRepository: IClienteRepository;
@@ -24,6 +26,14 @@ export class VentaService {
 
   public setSesion(sesion : Sesion){
     this.sesion = sesion;
+  }
+
+  public getSesion() : Sesion{
+    return this.sesion;
+  }
+
+  public getVenta() : Venta{
+    return this.venta;
   }
 
   public async crearNuevaVenta( dni : number): Promise<Venta | null>{
@@ -84,8 +94,10 @@ export class VentaService {
   }
   
   public async seleccionarArticulo(id : string, cantidad : number) : Promise<LineaDeVenta[] | null>{
-    try{ 
+    try{
+       
       const inventario = await this.articuloRepository.busarInventarioId({id});
+
       if(inventario && inventario.getCantidad() > 0){
         
         const precio = inventario.getArticulo().obtenerMontoTotal();
@@ -107,8 +119,8 @@ export class VentaService {
 
   public async buscarArticulo(codigo : string) : Promise<Inventario[] | null>{
     try{
-      
-      const articulo = await this.articuloRepository.buscarArticulo({codigo});
+      const sucursalId = this.sesion.getSucursal().getId()
+      const articulo = await this.articuloRepository.buscarArticulo({codigo,sucursalId});
 
       if(articulo){
         try{

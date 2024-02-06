@@ -2,20 +2,20 @@ export class TarjetaData {
     private data: any;
   
     constructor(
-      cardNumber: string,
-      expirationMonth: string,
-      expirationYear: string,
-      securityCode: string,
-      cardHolderName: string,
-      cardHolderIdentification: { type: string; number: string }
+      card_number : string,
+      card_expiration_month: string,
+      card_expiration_year: string,
+      security_code: string,
+      card_holder_name: string,
+      card_holder_identification: {type : string, dni : string}
     ) {
       this.data = {
-        card_number: cardNumber,
-        card_expiration_month: expirationMonth,
-        card_expiration_year: expirationYear,
-        security_code: securityCode,
-        card_holder_name: cardHolderName,
-        card_holder_identification: cardHolderIdentification
+        card_number: card_number,
+        card_expiration_month: card_expiration_month,
+        card_expiration_year: card_expiration_year,
+        security_code: security_code,
+        card_holder_name: card_holder_name,
+        card_holder_identification: card_holder_identification
       };
     }
   

@@ -27,6 +27,10 @@ export class Sesion{
           }
           return Sesion.instancia;
         }
+
+        getSucursal() : Sucursal{
+          return this.sucursal;
+        }
       
         getUsuario(): Usuario {
           return this.usuario;
