@@ -11,16 +11,19 @@ import { Inventario } from "../domain/entities/Inventario";
 import { LineaDeVenta } from "../domain/entities/LineaDeVenta";
 //import { ConexionAfipService } from "./ConexionAfipService";
 import { Sucursal } from "../domain/entities/Sucursal";
+import { IVentaRepository } from "../domain/repositories/IVentaRepository";
 
 export class VentaService {
   private clienteRepository: IClienteRepository;
   private articuloRepository: IArticuloRepository;
+  private ventaRepository : IVentaRepository;
   private sesion : Sesion;
-  private venta! : Venta;
+  private venta! : Venta | undefined;
 
-  constructor(clienteRepository: IClienteRepository, articuloRepository : IArticuloRepository, sesion : Sesion) {
+  constructor(clienteRepository: IClienteRepository, articuloRepository : IArticuloRepository, sesion : Sesion, ventaRepo : IVentaRepository) {
     this.clienteRepository = clienteRepository;
     this.articuloRepository = articuloRepository;
+    this.ventaRepository = ventaRepo;
     this.sesion = sesion;
   }
 
@@ -32,8 +35,15 @@ export class VentaService {
     return this.sesion;
   }
 
-  public getVenta() : Venta{
-    return this.venta;
+  public getVenta(){
+    if(this.venta){
+      return this.venta;
+    }
+    console.error('Venta no creada');
+  }
+
+  public resetVenta() : void{
+    this.venta = undefined;
   }
 
   public async crearNuevaVenta( dni : number): Promise<Venta | null>{
@@ -103,11 +113,18 @@ export class VentaService {
         const precio = inventario.getArticulo().obtenerMontoTotal();
         const lineadeVenta = new LineaDeVenta(inventario, cantidad, precio);
 
-        this.venta.agregarLineaDeVenta(lineadeVenta);
+        if(this.venta){
+          this.venta.agregarLineaDeVenta(lineadeVenta);
+        
 
-        inventario.setCantidad(inventario.getCantidad() - 1);
+          inventario.setCantidad(inventario.getCantidad() - 1);
 
-        return this.venta.getLineaDeVenta();
+          return this.venta.getLineaDeVenta();
+
+        }else{
+          console.error('Venta no creada');
+          return null;
+        }
       }else{
         console.error('error: inventario invalido o sin stock');
         return null;
@@ -147,7 +164,12 @@ export class VentaService {
   }
   
   public async finalizarVenta(){
-    
-  }
+    if(this.venta){
+      const venta = this.venta
+      venta.setEstado("Aprobado");
+      this.ventaRepository.insertVenta({ venta });
 
+      this.resetVenta();
+    }
+  }
 }

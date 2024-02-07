@@ -64,4 +64,7 @@ export class VentaServiceController{
         }
     }
       
+    public finalizarVenta(){
+        this.ventaService.finalizarVenta();
+    }
 }

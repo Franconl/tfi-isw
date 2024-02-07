@@ -10,12 +10,14 @@ import { Inventario } from '../../domain/entities/Inventario';
 //import { AfipServiceController } from '../controllers/AfipServiceController';
 import { TarjetaServiceController } from '../controllers/TarjetaServiceController';
 import { ConexionTarjetaService } from '../../aplication/ConexionSistTarjetaService';
+import { VentaRepository } from '../../mock/VentaRepository';
 
 const router = express.Router();
 
 const ArticuloRepo = new ArticuloMock();
 const ClienteRepo = new ServicioBusquedaClientesMock();
-var ventaService : VentaService = new VentaService(ClienteRepo, ArticuloRepo, sesion);
+const ventaRepo = new VentaRepository()
+var ventaService : VentaService = new VentaService(ClienteRepo, ArticuloRepo, sesion, ventaRepo);
 var ventaCtrl = new VentaServiceController(ventaService);
 
 
@@ -68,6 +70,7 @@ var tarjetaController : TarjetaServiceController;
   router.post('/venta/tarjeta', async (req,res) =>{
     try{
       const response = await tarjetaController.confirmarPago(req,res);
+      ventaCtrl.finalizarVenta();
       res.status(200).send(response);
     }catch(error) {
       res.status(500).json({ mensaje: 'Error interno del servidor' });

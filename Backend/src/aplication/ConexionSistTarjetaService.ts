@@ -4,10 +4,17 @@ import { Venta } from "../domain/entities/Venta";
 import { VentaService } from "./VentaService";
 
 export class ConexionTarjetaService {
-  private venta : Venta;
+  private venta! : Venta;
 
-  constructor(ventaService : VentaService) {
-    this.venta = ventaService.getVenta();
+  constructor(ventaService: VentaService) {
+
+    const venta = ventaService.getVenta();
+
+    if (venta instanceof Venta) {
+      this.venta = venta;
+    } else {
+      console.error('La venta obtenida no es una instancia de Venta');
+    }
   }
 
   public async solicitarToken(tarjetaData: TarjetaData): Promise<any> {
