@@ -11,6 +11,7 @@ import { Inventario } from '../../domain/entities/Inventario';
 import { TarjetaServiceController } from '../controllers/TarjetaServiceController';
 import { ConexionTarjetaService } from '../../aplication/ConexionSistTarjetaService';
 import { VentaRepository } from '../../mock/VentaRepository';
+import { afipServiceController } from "../routes/auth.routes";
 
 const router = express.Router();
 
@@ -19,7 +20,7 @@ const ClienteRepo = new ServicioBusquedaClientesMock();
 const ventaRepo = new VentaRepository()
 var ventaService : VentaService = new VentaService(ClienteRepo, ArticuloRepo, sesion, ventaRepo);
 var ventaCtrl = new VentaServiceController(ventaService);
-
+var afipService;
 
 var tarjetaService : ConexionTarjetaService;
 var tarjetaController : TarjetaServiceController;
@@ -29,8 +30,10 @@ var tarjetaController : TarjetaServiceController;
     try {
 
       ventaService.setSesion(sesion);
+      
 
       const venta = await ventaCtrl.nuevaVenta(req, res);
+
 
       res.status(200).send(venta);
     } catch (error) {
@@ -76,6 +79,16 @@ var tarjetaController : TarjetaServiceController;
       res.status(500).json({ mensaje: 'Error interno del servidor' });
     }
   });
+
+
+// finalizar seleccion/agregado de articulos
+  router.post('/venta/cae' , async (req,res) =>{
+    try{
+      const response = await afipServiceController.solicitarCae(ventaService);
+    }catch(error) {
+      res.status(500).json({ mensaje: 'Error interno del servidor' });
+    }
+  })
 
 
 export default router;

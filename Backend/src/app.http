@@ -42,3 +42,6 @@ Content-Type: application/json
 
 ### Confirmar pago tarjeta
 POST {{BASE_API}}/venta/tarjeta?monto=2000
+
+### finalizar seleccion
+POST {{BASE_API}}/venta/cae
