@@ -6,10 +6,11 @@ import { LineaDeVenta } from "../entities/LineaDeVenta";
 import { Cliente } from "../entities/Cliente";
 import { v4 as uuid } from "uuid";
 import { Comprobante } from "./Comprobante";
+import { format } from 'date-fns';
 
 export class Venta {
   private id: string;
-  private fecha: Date;
+  private fecha: string;
   private monto!: number;
   private estado: string;
   private tipoDeComprobante!: TipoDeComprobante;
@@ -23,7 +24,9 @@ export class Venta {
   constructor(usuario: Usuario, cliente: Cliente, puntoDeVenta : PuntoDeVenta) {
     this.puntoDeVenta = puntoDeVenta;
     this.id = uuid();
-    this.fecha = new Date();
+    const fecha = new Date();
+    const fechaFormateada = format(fecha, "yyyy-MM-dd'T'HH:mm:ss.SS");
+    this.fecha = fechaFormateada;
     this.usuario = usuario;
     this.cliente = cliente;
     this.lineasDeVenta = [];
@@ -35,7 +38,7 @@ export class Venta {
     return this.id;
   }
 
-  getFecha() : Date {
+  getFecha() : string {
     return this.fecha;
   }
 

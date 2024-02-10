@@ -16,7 +16,7 @@ export class ArticuloMock implements IArticuloRepository{
         const tipoDeTalle = new TipoDeTalle('1234', 'EU');
         const categoria = new Categoria('1234', 'Remera');
         const marca = new Marca('123', 'nike');
-        const articulo1 = new Articulo('1234', 'remera azul', 200, 23, tipoDeTalle, categoria, marca);
+        const articulo1 = new Articulo('1234', 'remera azul', 400, 20, tipoDeTalle, categoria, marca);
 
         this.articulo = [articulo1]
 

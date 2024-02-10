@@ -98,7 +98,7 @@ export class Articulo {
     
       obtenerMontoIVA(): number {
         const montoNeto = this.obtenerMontoNeto();
-        const montoIVA = montoNeto * 0.12; // Suponiendo un 12% de IVA, ajustar según sea necesario
+        const montoIVA = montoNeto * 0.21; 
         return montoIVA;
       }
     

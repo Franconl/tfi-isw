@@ -5,9 +5,6 @@ import { VentaService } from '../../aplication/VentaService';
 import {ServicioBusquedaClientesMock} from '../../mock/BusquedaClienteMock';
 import { VentaServiceController } from '../controllers/VentaServiceController';
 import { sesion } from './auth.routes';
-import { Inventario } from '../../domain/entities/Inventario';
-//import { ConexionAfipService } from '../../aplication/ConexionAfipService';
-//import { AfipServiceController } from '../controllers/AfipServiceController';
 import { TarjetaServiceController } from '../controllers/TarjetaServiceController';
 import { ConexionTarjetaService } from '../../aplication/ConexionSistTarjetaService';
 import { VentaRepository } from '../../mock/VentaRepository';
@@ -59,7 +56,7 @@ var tarjetaController : TarjetaServiceController;
     }
   });
 
-  router.get('/venta/tarjeta', async (req, res) => {
+  router.post('/venta/tarjeta', async (req, res) => {
     try{
       tarjetaService = new ConexionTarjetaService(ventaService);
       tarjetaController = new TarjetaServiceController(tarjetaService);
@@ -70,7 +67,7 @@ var tarjetaController : TarjetaServiceController;
     }
   });
 
-  router.post('/venta/tarjeta', async (req,res) =>{
+  router.post('/venta/tarjeta/confirmar', async (req,res) =>{
     try{
       const response = await tarjetaController.confirmarPago(req,res);
       ventaCtrl.finalizarVenta();

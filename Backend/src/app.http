@@ -23,9 +23,12 @@ GET {{BASE_API}}/articulo?=1234
 ### Seleccionar Articulo
 POST {{BASE_API}}/venta/inventario?cantidad=1?id=3297b322-2331-4b27-b6d0-a6d668c9fe2d
 
+### finalizar seleccion articulos
+POST {{BASE_API}}/venta/cae
+
 ### Solicitar Token Tarjeta
 
-GET {{BASE_API}}/venta/tarjeta
+POST {{BASE_API}}/venta/tarjeta
 Content-Type: application/json
 
 {
@@ -41,7 +44,4 @@ Content-Type: application/json
 }
 
 ### Confirmar pago tarjeta
-POST {{BASE_API}}/venta/tarjeta?monto=2000
-
-### finalizar seleccion
-POST {{BASE_API}}/venta/cae
+POST {{BASE_API}}/venta/tarjeta/confirmar?monto=2000

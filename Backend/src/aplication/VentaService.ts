@@ -12,6 +12,7 @@ import { LineaDeVenta } from "../domain/entities/LineaDeVenta";
 //import { ConexionAfipService } from "./ConexionAfipService";
 import { Sucursal } from "../domain/entities/Sucursal";
 import { IVentaRepository } from "../domain/repositories/IVentaRepository";
+import { Comprobante } from "../domain/entities/Comprobante";
 
 export class VentaService {
   private clienteRepository: IClienteRepository;
@@ -172,4 +173,16 @@ export class VentaService {
       this.resetVenta();
     }
   }
+
+
+  public crearComprobante(cae : string){
+      if(this.venta){
+        const comprobante = new Comprobante(this.venta.getTipoDeComprobante(),
+        this.venta.getLineaDeVenta(),this.venta.getCliente(), cae)
+
+        this.venta.setComprobante(comprobante);
+
+        console.log('Comprobante creado');
+      }
+    }
 }

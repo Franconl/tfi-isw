@@ -1,20 +1,20 @@
 import { Cliente } from "./Cliente";
 import { LineaDeVenta } from "./LineaDeVenta";
 import { TipoDeComprobante } from "./TipoDeComprobante";
-import { Venta } from "./Venta";
+import { v4  as uuid} from "uuid";
 
 export class Comprobante {
     private tipo : TipoDeComprobante;
-    private numero : number;
-    private venta : Venta;
+    private id : string;
     private items : LineaDeVenta[];
     private cliente : Cliente;
+    private cae! : string;
 
-    constructor(tipo : TipoDeComprobante, numero : number, venta : Venta, items : LineaDeVenta[], cliente : Cliente){
+    constructor(tipo : TipoDeComprobante, items : LineaDeVenta[], cliente : Cliente, cae : string){
         this.tipo = tipo;
-        this.numero = numero;
-        this.venta = venta;
+        this.id = uuid();
         this.items = items;
+        this.cae = cae;
         this.cliente = cliente;
     }
 

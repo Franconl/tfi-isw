@@ -18,14 +18,18 @@ export class AfipServiceController {
             const parseStringAsync = promisify(parseString);
             const data: any = await parseStringAsync(response);
     
-            // Acceder a los datos según la estructura del objeto JSON devuelto
             const result = data['s:Envelope']['s:Body'][0]['SolicitarAutorizacionResponse'][0]['SolicitarAutorizacionResult'][0];
     
             const puntoVenta = result['a:PuntoVenta'][0];
             const token = result['a:Token'][0];
             const vencimiento = result['a:Vencimiento'][0];
-    
-            this.afipService.getSesion().setTokenAfip(token);
+            
+            if(token){
+                this.afipService.setToken(token);
+                console.log('token solicitado');
+                return token;
+            }throw Error;
+            
             
         } catch (error) {
             console.error('Error al solicitar Token:', error);
@@ -52,12 +56,16 @@ export class AfipServiceController {
                 const id = comprobante['a:Id'][0];
                 const numero = comprobante['a:Numero'][0];
                 
-                
-                if (descripcion === 'Factura A') {
-                    this.afipService.getSesion().setNumeroComprobanteA(parseInt(numero) + 1);
-                } else if (descripcion === 'Factura B') {
-                    this.afipService.getSesion().setNumeroComprobanteB(parseInt(numero) + 1);
+                if(numero){
+                    if (descripcion === 'Factura A') {
+                        this.afipService.getSesion().setNumeroComprobanteA(parseInt(numero) + 1);
+                    } else if (descripcion === 'Factura B') {
+                        this.afipService.getSesion().setNumeroComprobanteB(parseInt(numero) + 1);
+                    }
+
+                    console.log('Ultimos comprobantes solicitados')
                 }
+                
             }
         } catch (error) {
             console.error('Error al solicitar comprobantes:', error);
@@ -70,7 +78,22 @@ export class AfipServiceController {
         var venta = ventaService.getVenta();
         try{
             if(venta){
-                await this.afipService.solicitarCae(venta);
+                const xmlResponse = await this.afipService.solicitarCae(venta);
+
+                const parseStringAsync = promisify(parseString);
+                const data: any = await parseStringAsync(xmlResponse);
+
+                const cae = data['s:Envelope']['s:Body'][0]['SolicitarCaeResponse'][0]['SolicitarCaeResult'][0]['a:Cae'][0];
+                const error = data['s:Envelope']['s:Body'][0]['SolicitarCaeResponse'][0]['SolicitarCaeResult'][0]['a:Error'][0];
+                const estado = data['s:Envelope']['s:Body'][0]['SolicitarCaeResponse'][0]['SolicitarCaeResult'][0]['a:Estado'][0];
+                const fechaDeVencimiento = data['s:Envelope']['s:Body'][0]['SolicitarCaeResponse'][0]['SolicitarCaeResult'][0]['a:FechaDeVencimiento'][0];
+                const observacion = data['s:Envelope']['s:Body'][0]['SolicitarCaeResponse'][0]['SolicitarCaeResult'][0]['a:Observacion'][0];
+                const tipoComprobante = data['s:Envelope']['s:Body'][0]['SolicitarCaeResponse'][0]['SolicitarCaeResult'][0]['a:TipoComprobante'][0];
+
+                if(estado == 'Aprobada' || estado == 'AprobadaParcialmente'){
+                    console.log('Venta Aprobada por AFIP');
+                    ventaService.crearComprobante(cae);
+                }
             }
         }catch(error) {
             console.error('Error al solicitar comprobantes:', error);
