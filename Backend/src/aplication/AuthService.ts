@@ -1,9 +1,9 @@
 import { PuntoDeVenta } from "../domain/entities/PuntoDeVenta";
 import { Sucursal } from "../domain/entities/Sucursal";
 import { Usuario } from "../domain/entities/Usuario";
-import { IClienteRepository } from "../domain/repositories/IClienteRepository";
-import { ISucursalRepository } from "../domain/repositories/ISucursalRepository";
-import { IUsuarioRepository } from "../domain/repositories/IUsuarioRepository";
+import { IClienteRepository } from "../domain/interfaces/IClienteRepository";
+import { ISucursalRepository } from "../domain/interfaces/ISucursalRepository";
+import { IUsuarioRepository } from "../domain/interfaces/IUsuarioRepository";
 
 
 export class AuthService{

@@ -1,18 +1,18 @@
 // router.ts
 import express from 'express';
-import { ArticuloMock } from '../../mock/ArticuloMock';
 import { VentaService } from '../../aplication/VentaService';
-import {ServicioBusquedaClientesMock} from '../../mock/BusquedaClienteMock';
+import {ServicioBusquedaClientesMock} from '../../repositroy/BusquedaClienteMock';
 import { VentaServiceController } from '../controllers/VentaServiceController';
 import { sesion } from './auth.routes';
 import { TarjetaServiceController } from '../controllers/TarjetaServiceController';
 import { ConexionTarjetaService } from '../../aplication/ConexionSistTarjetaService';
-import { VentaRepository } from '../../mock/VentaRepository';
+import { VentaRepository } from '../../repositroy/VentaRepository';
 import { afipServiceController } from "../routes/auth.routes";
+import { ArticuloMongo } from '../../repositroy/articulo.mongo';
 
 const router = express.Router();
 
-const ArticuloRepo = new ArticuloMock();
+const ArticuloRepo = new ArticuloMongo()
 const ClienteRepo = new ServicioBusquedaClientesMock();
 const ventaRepo = new VentaRepository()
 var ventaService : VentaService = new VentaService(ClienteRepo, ArticuloRepo, sesion, ventaRepo);
@@ -38,7 +38,7 @@ var tarjetaController : TarjetaServiceController;
     }
   });
 
-  router.get('/articulo', async (req, res) => {
+  router.get('/inventario', async (req, res) => {
     try{
       const response = await ventaCtrl.buscarArticulo(req,res);
       res.status(200).send(response);
@@ -47,7 +47,7 @@ var tarjetaController : TarjetaServiceController;
     }
   });
 
-  router.post('/venta/inventario', async (req, res) => {
+  router.post('/venta/seleccionar', async (req, res) => {
     try{ 
         const response = await ventaCtrl.seleccionarArticulo(req,res);
         res.status(200).send(response);

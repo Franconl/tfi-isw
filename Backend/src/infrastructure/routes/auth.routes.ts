@@ -1,7 +1,7 @@
 import express from "express";
-import { UsuarioMock } from "../../mock/UsuarioMock";
+import { UsuarioMock } from "../../repositroy/UsuarioMock";
 import { AuthService } from "../../aplication/AuthService";
-import { SucursalMock } from "../../mock/SucursalMock";
+import { SucursalMock } from "../../repositroy/SucursalMock";
 import { AuthController } from "../controllers/AuthController";
 import { Sesion } from "../../domain/entities/Sesion";
 import { ConexionAfipService } from "../../aplication/ConexionAfipService";

@@ -3,15 +3,15 @@ import { Cliente } from "../domain/entities/Cliente";
 import { CondicionTributaria } from "../domain/entities/CondicionTributaria";
 import { TipoDeComprobante } from "../domain/entities/TipoDeComprobante";
 import { Usuario } from "../domain/entities/Usuario";
-import { IClienteRepository } from "../domain/repositories/IClienteRepository";
+import { IClienteRepository } from "../domain/interfaces/IClienteRepository";
 import { Articulo } from "../domain/entities/Articulo";
-import { IArticuloRepository } from "../domain/repositories/IArticuloReposiroty";
+import { IArticuloRepository } from "../domain/interfaces/IArticuloReposiroty";
 import { Sesion } from "../domain/entities/Sesion";
 import { Inventario } from "../domain/entities/Inventario";
 import { LineaDeVenta } from "../domain/entities/LineaDeVenta";
 //import { ConexionAfipService } from "./ConexionAfipService";
 import { Sucursal } from "../domain/entities/Sucursal";
-import { IVentaRepository } from "../domain/repositories/IVentaRepository";
+import { IVentaRepository } from "../domain/interfaces/IVentaRepository";
 import { Comprobante } from "../domain/entities/Comprobante";
 
 export class VentaService {
@@ -138,11 +138,11 @@ export class VentaService {
   public async buscarArticulo(codigo : string) : Promise<Inventario[] | null>{
     try{
       const sucursalId = this.sesion.getSucursal().getId()
-      const articulo = await this.articuloRepository.buscarArticulo({codigo,sucursalId});
+      const articulo = await this.articuloRepository.buscarArticulo({id : codigo});
 
       if(articulo){
         try{
-          const inventario : Inventario[] | null = await this.articuloRepository.buscarInventario({articulo});
+          const inventario : Inventario[] | null = await this.articuloRepository.buscarInventario({articulo , sucursalId});
           if (inventario){
             return inventario;
           }else{

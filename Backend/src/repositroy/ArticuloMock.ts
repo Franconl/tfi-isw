@@ -1,4 +1,4 @@
-import { Articulo } from "../domain/entities/Articulo";
+/*import { Articulo } from "../domain/entities/Articulo";
 import { Categoria } from "../domain/entities/Categoria";
 import { Color } from "../domain/entities/Color";
 import { Inventario } from "../domain/entities/Inventario";
@@ -6,7 +6,7 @@ import { Marca } from "../domain/entities/Marca";
 import { Sucursal } from "../domain/entities/Sucursal";
 import { Talle } from "../domain/entities/Talle";
 import { TipoDeTalle } from "../domain/entities/TipoDeTalle";
-import { IArticuloRepository } from "../domain/repositories/IArticuloReposiroty";
+import { IArticuloRepository } from "../domain/interfaces/IArticuloReposiroty";
 
 export class ArticuloMock implements IArticuloRepository{
     private articulo : Articulo[];
@@ -48,4 +48,8 @@ export class ArticuloMock implements IArticuloRepository{
             return Promise.resolve(this.inventario[0]);
         }else return Promise.resolve(null);
     }
-}
+
+    crear(criterios: { articulo: Articulo; }): void {
+        Promise.resolve(null)
+    }
+}*/

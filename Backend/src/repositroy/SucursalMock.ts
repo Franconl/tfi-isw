@@ -1,6 +1,6 @@
 import { PuntoDeVenta } from "../domain/entities/PuntoDeVenta";
 import { Sucursal } from "../domain/entities/Sucursal";
-import { ISucursalRepository } from "../domain/repositories/ISucursalRepository";
+import { ISucursalRepository } from "../domain/interfaces/ISucursalRepository";
 
 export class SucursalMock implements ISucursalRepository {
   public getSucursal(criterios: { id: string; }): Promise<Sucursal | null> {

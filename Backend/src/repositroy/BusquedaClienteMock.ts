@@ -1,5 +1,5 @@
 import { Cliente } from "../domain/entities/Cliente";
-import { IClienteRepository } from "../domain/repositories/IClienteRepository";
+import { IClienteRepository } from "../domain/interfaces/IClienteRepository";
 
 export class ServicioBusquedaClientesMock implements IClienteRepository {
   

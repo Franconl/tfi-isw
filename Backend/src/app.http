@@ -45,3 +45,48 @@ Content-Type: application/json
 
 ### Confirmar pago tarjeta
 POST {{BASE_API}}/venta/tarjeta/confirmar?monto=2000
+
+
+
+### Crear Articulo
+
+PUT {{BASE_API}}/articulo
+Content-Type: application/json
+
+{
+  "descripcion": "Camiseta de algodón",
+  "costo": 10000,
+  "margenDeGanancia": 20,
+  "tipoDetalle": "65c8fc477e268ad35137fe1b",
+  "categoria": "65c8fbbf7e268ad35137fe15",
+  "marca": "65c8fbde7e268ad35137fe17"
+}
+
+###crear Categoria
+PUT {{BASE_API}}/categoria
+Content-Type: application/json
+
+{
+    "nombre": "Remera Deportiva"
+}
+
+###crear Marca
+PUT {{BASE_API}}/marca
+Content-Type: application/json
+
+{
+    "nombre": "Puma"
+}
+
+###crear Tipo de Talle
+PUT {{BASE_API}}/tipodetalle
+Content-Type: application/json
+
+{
+    "nombre": "US"
+}
+
+
+### buscar articulo
+
+GET {{BASE_API}}/articulo?id=65c90801cb86b867a38bb09e

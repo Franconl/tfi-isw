@@ -1,21 +1,12 @@
 export class Marca {
-    private id: string;
+    private id : string;
     private nombre: string;
   
-    constructor(id: string, nombre: string) {
+    constructor(id : string,nombre: string) {
       this.id = id;
       this.nombre = nombre;
     }
   
-    // Getter para 'id'
-    getId(): string {
-      return this.id;
-    }
-  
-    // Setter para 'id'
-    setId(id: string): void {
-      this.id = id;
-    }
   
     // Getter para 'nombre'
     getNombre(): string {
