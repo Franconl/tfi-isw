@@ -13,34 +13,39 @@ export class AuthController {
     this.authService = authService;
   }
 
-  public async iniciarSesion(req: Request, res: Response) : Promise<Sesion | null> {
+  public async iniciarSesion(req: Request, res: Response): Promise<Sesion | null> {
     try {
-      const userParam = req.query.user as string;
-      const passwordParam = req.query.pass as string;
-      const sucursalParam = req.query.sucursal as string;
-      const puntoDeVentaParam =parseInt(req.query.puntoDeVenta as string);
+        const { user, pass, sucursal, puntoDeVenta } = req.body;
 
-      const user = await this.authService.authUser(userParam, passwordParam);
-      const sucursal = await this.authService.getSucursal(sucursalParam);
-      const puntoDeVenta = await this.authService.getPuntoDeVenta(puntoDeVentaParam);
+        // Verificar si los datos necesarios están presentes en el cuerpo de la solicitud
+        if (!user || !pass || !sucursal || !puntoDeVenta) {
+            res.status(400).json({ mensaje: 'Faltan datos en el cuerpo de la solicitud' });
+            return null;
+        }
 
-      if (user && sucursal && puntoDeVenta && puntoDeVenta.getEstado() == "disponible") {
+        // Obtener la información del usuario, sucursal y punto de venta
+        const usuario = await this.authService.authUser(user, pass);
+        const infoSucursal = await this.authService.getSucursal(sucursal);
+        const infoPuntoDeVenta = await this.authService.getPuntoDeVenta(puntoDeVenta);
 
-        const sesion = this.crearSesion(user, sucursal, puntoDeVenta);
-        puntoDeVenta.setEstado("ocupado");
-        return sesion;
-      } else {
-
-        res.status(401).json({ mensaje: 'Credenciales o sucursal inválidas' });
-        return null;
-      }
+        // Verificar si se encontraron los datos necesarios y el punto de venta está disponible
+        if (usuario && infoSucursal && infoPuntoDeVenta && infoPuntoDeVenta.getEstado() === "disponible") {
+            // Crear y retornar la sesión
+            const sesion = this.crearSesion(usuario, infoSucursal, infoPuntoDeVenta);
+            infoPuntoDeVenta.setEstado("ocupado");
+            return sesion;
+        } else {
+            // Devolver un error si los datos son inválidos o el punto de venta no está disponible
+            res.status(401).json({ mensaje: 'Credenciales o sucursal inválidas o punto de venta no disponible' });
+            return null;
+        }
     } catch (error) {
-      console.error('Error al iniciar sesión:', error);
-
-      res.status(500).json({ mensaje: 'Error interno del servidor' });
-      return null;
+        console.error('Error al iniciar sesión:', error);
+        res.status(500).json({ mensaje: 'Error interno del servidor' });
+        return null;
     }
-  }
+}
+
 
   // Método para crear la sesión (ajusta según tu implementación real)
   private crearSesion(usuario: Usuario, sucursal: Sucursal, puntoDeVenta : PuntoDeVenta) {

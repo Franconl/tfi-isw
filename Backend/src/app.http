@@ -16,12 +16,12 @@ POST {{BASE_API}}/?user=pepe&pass=1234&sucursal=1&puntoDeVenta=1
 POST {{BASE_API}}/venta?dni=1234
 
 
-### Buscar Articulo
+### Buscar Articulo e inventario diponible
 
-GET {{BASE_API}}/articulo?=1234
+GET {{BASE_API}}/inventario?id=65c91913a2929dfba633b72b&sucursalId=65c923f5229d4ff6cd26c860
 
-### Seleccionar Articulo
-POST {{BASE_API}}/venta/inventario?cantidad=1?id=3297b322-2331-4b27-b6d0-a6d668c9fe2d
+### Seleccionar Inventario
+POST {{BASE_API}}/venta/seleccionar?cantidad=1&id=65ca4d63f19d64616b337ea5
 
 ### finalizar seleccion articulos
 POST {{BASE_API}}/venta/cae
@@ -89,4 +89,4 @@ Content-Type: application/json
 
 ### buscar articulo
 
-GET {{BASE_API}}/articulo?id=65c90801cb86b867a38bb09e
+GET {{BASE_API}}/articulo?id=65c91913a2929dfba633b72b

@@ -15,11 +15,21 @@ export class AuthService{
         this.repositorySucursal = repoSucursal;
     }
 
-    public async authUser(us : string , pass : string) : Promise<Usuario | null>{
+    public async authUser(us : string , pass : string) : Promise<any>{
         try{
-            const usuario = await this.repositoryUsuario.authUsuario({us , pass});
-            if(usuario) return usuario;
-            else return null;
+            const usuario : Usuario= await this.repositoryUsuario.obtenerUsuarioPorUsuario(us);
+            if(!usuario){
+                console.error('Usuario no Registrado');
+                return null;
+            }
+
+            if(usuario.getPassword() == pass){
+                return usuario;
+            }else{
+                console.error('contraseña incorrecta');
+                return null;
+            }
+
         }catch(error){
             console.error('error al autentificar usuario', error);
             return null;

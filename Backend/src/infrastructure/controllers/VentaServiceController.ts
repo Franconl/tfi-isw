@@ -28,33 +28,18 @@ export class VentaServiceController{
         }
     }
 
-    public async buscarArticulo(req: Request, res: Response) : Promise<Inventario[] | null>{
-        const codigo = req.query.codigo as string;
-        const sucursalId = req.query.sucursal as string
-        try{
-            const inventario = await this.ventaService.buscarArticulo(codigo);
-            if(inventario){
-                return inventario;
-            }else{
-                res.status(400).json({ mensaje: 'error al obtener inventario' });
-                return null;  
-            }
-        }catch(error){
-            console.error('Error en nuevaVenta:', error);
-            res.status(400).json({ mensaje: 'Error al acceder al servicio de Venta' });
-            return null;
-        }
-       
-        
-    }
 
-    public async seleccionarArticulo(req: Request, res: Response) : Promise<LineaDeVenta[] | null>{
+
+    public async seleccionarInventario(req: Request, res: Response) : Promise<LineaDeVenta[] | null>{
         try {
 
             const inventarioId = req.query.id as string;
             const cantidad: number = parseInt(req.query.cantidad as string);
 
-            const ldv = await this.ventaService.seleccionarArticulo(inventarioId, cantidad);
+            const ldv = await this.ventaService.seleccionarInventario(inventarioId, cantidad);
+            if(!ldv){
+                res.status(404).json({ mensaje: 'Error al seleccionar inventario' })
+            }
             return ldv;
         } catch (error) {
             // Manejar el error y responder con un mensaje de error

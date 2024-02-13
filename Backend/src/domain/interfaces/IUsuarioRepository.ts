@@ -1,5 +1,7 @@
 import { Usuario } from "../entities/Usuario";
 
 export interface IUsuarioRepository{
-    authUsuario(criterios : {us : string , pass : string} ) : Promise <Usuario | null>;
+    crearUsuario(usuario: Usuario): Promise<boolean>;
+    obtenerUsuarioPorUsuario(usuario: string): Promise<any>;
+    eliminarUsuario(usuario: string): Promise<any>;
 }

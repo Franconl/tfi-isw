@@ -1,5 +1,4 @@
 import { CondicionTributaria } from "./CondicionTributaria";
-import { v4 as uuid } from "uuid";
 
 export class Cliente {
   private id : string;
@@ -13,8 +12,8 @@ export class Cliente {
   private cuil? : number;
   private cuit? : number;
 
-  constructor(nombre: string, apellido: string, telefono: string, email: string, domicilio: string, options: { dni?: number; cuil?: number; cuit?: number }) {
-    this.id = uuid();
+  constructor(id : string, nombre: string, apellido: string, telefono: string, email: string, domicilio: string, options: { dni?: number; cuil?: number; cuit?: number }) {
+    this.id = id;
     this.nombre = nombre;
     this.apellido = apellido;
     this.telefono = telefono;

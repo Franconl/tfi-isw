@@ -2,7 +2,6 @@ import { Articulo } from "./Articulo";
 import { Color } from "./Color";
 import { Sucursal } from "./Sucursal";
 import { Talle } from "./Talle";
-import { v4 as uuid } from "uuid";
 
 export class Inventario {
     private id : string;
@@ -13,8 +12,8 @@ export class Inventario {
     private sucursal : Sucursal;
 
 
-    constructor( cantidad : number, articulo : Articulo, talle : Talle, color : Color, sucursal : Sucursal){
-        this.id = uuid();
+    constructor(id : string, cantidad : number, articulo : Articulo, talle : Talle, color : Color, sucursal : Sucursal){
+        this.id = id;
         this.cantidad = cantidad;
         this.articulo = articulo;
         this.talle = talle;

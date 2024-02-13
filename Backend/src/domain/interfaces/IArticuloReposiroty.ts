@@ -6,8 +6,8 @@ import { Marca } from "../entities/Marca";
 import { TipoDeTalle } from "../entities/TipoDeTalle";
 
 export interface IArticuloRepository {
-    buscarArticulo(criterios: { id: string}): Promise<Articulo | null>
-    buscarInventario(criterios : { articulo : Articulo , sucursalId : string}) : Promise <Inventario[] | null>;
+    buscarArticulo(criterios: { id: string}): Promise<any>
+    buscarInventario(criterios : { articulo : Articulo , sucursalId : string}) : Promise <any>;
     busarInventarioId(criterios : { id : string}) : Promise <Inventario | null >;
     crear(criterios : { articulo : Articulo }) : Promise<any>;
     crearCategoria(criterios : { categoria : Categoria }) : Promise<any>;

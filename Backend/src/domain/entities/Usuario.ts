@@ -1,13 +1,14 @@
-import { Sesion } from "./Sesion";
 
 export class Usuario {
     private username: string;
     private password: string;
+    private permisos : string;
 
   
-    constructor(username: string, password: string) {
+    constructor(username: string, password: string, permisos : string) {
       this.username = username;
       this.password = password;
+      this.permisos = permisos;
     }
   
     // Getter para username

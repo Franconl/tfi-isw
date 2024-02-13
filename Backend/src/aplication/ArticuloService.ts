@@ -72,5 +72,19 @@ export class ArticuloService{
         
     }
 
+    public async buscarArticuloeInvantario(id : string, sucursalId : string){
+        try{
+            const articulo  = await this.articuloRepository.buscarArticulo({id});
+
+            console.log(sucursalId,'artservice')
+            const inventario = await this.articuloRepository.buscarInventario({articulo, sucursalId})
+            
+            return {articulo , inventario};
+        }catch (error) {
+            console.error('Error al buscar artículo:', error);
+            throw error;
+        }
+    }
+
 
 }

@@ -1,7 +1,6 @@
 // router.ts
 import express from 'express';
 import { VentaService } from '../../aplication/VentaService';
-import {ServicioBusquedaClientesMock} from '../../repositroy/BusquedaClienteMock';
 import { VentaServiceController } from '../controllers/VentaServiceController';
 import { sesion } from './auth.routes';
 import { TarjetaServiceController } from '../controllers/TarjetaServiceController';
@@ -9,11 +8,12 @@ import { ConexionTarjetaService } from '../../aplication/ConexionSistTarjetaServ
 import { VentaRepository } from '../../repositroy/VentaRepository';
 import { afipServiceController } from "../routes/auth.routes";
 import { ArticuloMongo } from '../../repositroy/articulo.mongo';
+import { ClienteMongo } from '../../repositroy/cliente.mongo';
 
 const router = express.Router();
 
-const ArticuloRepo = new ArticuloMongo()
-const ClienteRepo = new ServicioBusquedaClientesMock();
+const ArticuloRepo = new ArticuloMongo();
+const ClienteRepo = new ClienteMongo();
 const ventaRepo = new VentaRepository()
 var ventaService : VentaService = new VentaService(ClienteRepo, ArticuloRepo, sesion, ventaRepo);
 var ventaCtrl = new VentaServiceController(ventaService);
@@ -38,18 +38,9 @@ var tarjetaController : TarjetaServiceController;
     }
   });
 
-  router.get('/inventario', async (req, res) => {
-    try{
-      const response = await ventaCtrl.buscarArticulo(req,res);
-      res.status(200).send(response);
-    } catch (error) {
-      res.status(500).json({ mensaje: 'Error interno del servidor' });
-    }
-  });
-
   router.post('/venta/seleccionar', async (req, res) => {
     try{ 
-        const response = await ventaCtrl.seleccionarArticulo(req,res);
+        const response = await ventaCtrl.seleccionarInventario(req,res);
         res.status(200).send(response);
     }catch(error) {
       res.status(500).json({ mensaje: 'Error interno del servidor' });

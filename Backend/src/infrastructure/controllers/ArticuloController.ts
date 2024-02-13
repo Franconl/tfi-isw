@@ -74,5 +74,19 @@ export class ArticuloController {
             return null;
         }
     }
+
+    public async buscarArticuloeInventario(req : Request , res : Response){
+        const id = req.query.id as string;
+        const sucursalId = req.query.sucursalId as string;
+        try{
+            const response = await this.articuloService.buscarArticuloeInvantario(id,sucursalId);
+            console.log(response,'articuloctrl')
+            return response
+        }catch (error) {
+            console.error('Error al seleccionar el artículo:', error);
+            res.status(500).json({ mensaje: 'Error interno del servidor' });
+            return null;
+        }
+    }
     
 }

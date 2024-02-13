@@ -53,4 +53,13 @@ router.get('/articulo', async (req,res) => {
     res.status(500).json({ mensaje: 'Error interno del servidor' });
   }
 })
+
+router.get('/inventario', async (req, res) => {
+  try{
+    const response = await articuloCtrl.buscarArticuloeInventario(req,res);
+    res.status(200).send(response);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error interno del servidor' });
+  }
+});
 export default router;
