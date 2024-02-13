@@ -94,6 +94,7 @@ export class AfipServiceController {
                     console.log('Venta Aprobada por AFIP');
                     ventaService.crearComprobante(cae);
                 }
+                return {cae,error,estado,tipoComprobante}
             }
         }catch(error) {
             console.error('Error al solicitar comprobantes:', error);

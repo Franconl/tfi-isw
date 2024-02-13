@@ -13,6 +13,7 @@ import { LineaDeVenta } from "../domain/entities/LineaDeVenta";
 import { Sucursal } from "../domain/entities/Sucursal";
 import { IVentaRepository } from "../domain/interfaces/IVentaRepository";
 import { Comprobante } from "../domain/entities/Comprobante";
+import { Pago } from "../domain/entities/Pago";
 
 export class VentaService {
   private clienteRepository: IClienteRepository;
@@ -157,4 +158,50 @@ export class VentaService {
         console.log('Comprobante creado');
       }
     }
+
+    public async setCliente(dni : number){
+      try{
+        const cliente = await this.clienteRepository.obtenerClientePorDni(dni);
+
+        this.venta?.setCliente(cliente);
+
+        const condicionTributariaEmpresa : CondicionTributaria = CondicionTributaria.RESPONSABLE_INSCRIPTO; 
+        const tipoDeComprobante = this.determinarTipoDeComprobante(cliente.getCondicionTributaria(), condicionTributariaEmpresa);
+
+        // Asignar el tipo de comprobante a la venta
+        this.venta?.setTipoDeComprobante(tipoDeComprobante);
+        console.log('Cliente asignado Correctamente');
+        return cliente;
+      }catch(error){
+        console.error('error al buscar cliente');
+        return null;
+      }
+    }
+
+    public async crearCliente(cliente : Cliente){
+      try{
+        const response = await this.clienteRepository.crearCliente(cliente);
+        if(!cliente){
+          return null;
+        }
+        return response;
+      }catch(error){
+        console.error('error al buscar cliente');
+        return null;
+      }
+    }
+
+    public setPago(tipo : string){
+      const cliente = this.venta?.getCliente();
+      const monto = this.venta?.getImporteTotal();
+      if(!cliente || !monto){
+        return null;
+      }
+      const pago = new Pago(cliente,monto,tipo);
+
+      this.venta?.setPago(pago);
+
+      return pago;
+    }
+    
 }

@@ -31,7 +31,23 @@ export class ClienteMongo implements IClienteRepository {
     
     async obtenerClientePorDni(dni: number): Promise<any> {
         try {
-            const cliente = await ClienteModel.findOne({ dni }).exec();
+            const clienteMongo = await ClienteModel.findOne({ dni }).exec();
+            if(!clienteMongo){
+                console.error('Cliente no registrado');
+                return null;
+            }
+            console.log(clienteMongo)
+            if(!clienteMongo.nombre || !clienteMongo.apellido || !clienteMongo.telefono 
+                || !clienteMongo.email || !clienteMongo.domicilio || !clienteMongo.dni
+                || !clienteMongo.condicion || !clienteMongo._id){
+                    console.error('error al obtener datos del cliente');
+                    return null;
+            }
+            
+            const cliente = new Cliente(clienteMongo._id.toString(),clienteMongo.nombre,clienteMongo.apellido
+                ,clienteMongo.telefono,clienteMongo.email,clienteMongo.domicilio,
+                clienteMongo.condicion,{dni : dni, cuit : clienteMongo.cuit, cuil : clienteMongo.cuil})
+            
             return cliente;
         } catch (error) {
             console.error('Error al obtener el cliente por su DNI:', error);

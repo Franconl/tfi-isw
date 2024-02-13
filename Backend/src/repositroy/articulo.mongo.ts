@@ -16,7 +16,8 @@ import ColorModel from "../infrastructure/models/color.schemas";
 import { Color } from "../domain/entities/Color";
 import SucursalModel from "../infrastructure/models/sucursal.schema";
 import { Sucursal } from "../domain/entities/Sucursal";
-
+import PuntoDeVentaModel from "../infrastructure/models/puntoDeVenta.schema";
+import { PuntoDeVenta } from "../domain/entities/PuntoDeVenta";
 
 
 export class ArticuloMongo implements IArticuloRepository {
@@ -277,6 +278,17 @@ export class ArticuloMongo implements IArticuloRepository {
             }
         }
 
+        async buscarTiposDeTalle() {
+            try {
+                const tipos = await TipoDeTalleModel.find().exec();
+                return tipos.map(tipo => tipo.toObject());
+            } catch (error) {
+                console.error('Error al buscar los Tipos de Talle:', error);
+                throw error;
+            }
+        }
+        
+
         async crearMarca(criterios: { marca: Marca; }): Promise<void> {
             try {
                 await MarcaModel.create(criterios.marca);
@@ -296,6 +308,16 @@ export class ArticuloMongo implements IArticuloRepository {
             }catch(error){
                 console.error('Error al buscar Marca:', error);
                 throw error; 
+            }
+        }
+
+        async buscarMarcas() {
+            try {
+                const marcas = await MarcaModel.find().exec();
+                return marcas.map(marca => marca.toObject());
+            } catch (error) {
+                console.error('Error al buscar las marcas:', error);
+                throw error;
             }
         }
 
@@ -321,6 +343,16 @@ export class ArticuloMongo implements IArticuloRepository {
             }
         }
 
+        async buscarCategorias() {
+            try {
+                const categorias = await CategoriaModel.find().exec();
+                return categorias.map(categoria => categoria.toObject());
+            } catch (error) {
+                console.error('Error al buscar las categorías:', error);
+                throw error;
+            }
+        }
+
         async buscarColor(criterios: { id: string }) {
             try {
                 const color = await ColorModel.findById(criterios.id).exec();
@@ -337,16 +369,32 @@ export class ArticuloMongo implements IArticuloRepository {
         async buscarSucursal(criterios: { id: string }) {
             try {
                 const sucursal = await SucursalModel.findById(criterios.id).exec();
-                if (sucursal) {
-                    const response: Sucursal = sucursal.toObject();
-                    return response;
+                console.log(sucursal)
+                if (!sucursal || !sucursal.nombre || !sucursal.ciudad || !sucursal.telefono) {
+                    return null
                 }
+
+                const sucursalResponse = new Sucursal(sucursal.nombre,sucursal.ciudad,sucursal.telefono)
+
+                return sucursalResponse;
             } catch (error) {
                 console.error('Error al buscar la sucursal:', error);
                 throw error;
             }
         }
         
+        async buscarSucursales() {
+            try {
+                const sucursales = await SucursalModel.find().exec();
+                return sucursales.map(sucursal => sucursal.toObject());
+            } catch (error) {
+                console.error('Error al buscar las sucursales:', error);
+                throw error;
+            }
+        }
+
+
+
         async buscarTalle(criterios: { id: string }) {
             try {
                 const talle = await TalleModel.findById(criterios.id).exec();
@@ -356,6 +404,58 @@ export class ArticuloMongo implements IArticuloRepository {
                 }
             } catch (error) {
                 console.error('Error al buscar el talle:', error);
+                throw error;
+            }
+        }
+
+        async buscarTalles() {
+            try {
+                const talles = await TalleModel.find().exec();
+                return talles.map(talle => talle.toObject());
+            } catch (error) {
+                console.error('Error al buscar los talles:', error);
+                throw error;
+            }
+        }
+
+        async buscarPuntoDeVenta(criterios: { id: string }) {
+            try {
+                const pdvMongo = await PuntoDeVentaModel.findById(criterios.id).exec();
+                if(!pdvMongo || !pdvMongo._id || !pdvMongo.numero || !pdvMongo.sucursal || !pdvMongo.estado){
+                    console.error('error al obtener punto de venta')
+                    return null;
+                }
+                const id_suc = pdvMongo.sucursal.toString();
+                const sucursal = await this.buscarSucursal({id : id_suc});
+                console.log(sucursal,'')
+                if(!sucursal){
+                    console.error('error al obtener sucursal de pdv')
+                    return null;
+                }
+                const pdv : PuntoDeVenta = new PuntoDeVenta(pdvMongo._id.toString(),pdvMongo.numero,sucursal,pdvMongo.estado);
+                console.log(pdv,'art.mongo')
+                return pdv;
+            } catch (error) {
+                console.error('Error al buscar el punto de venta:', error);
+                throw error;
+            }
+        }
+
+        async buscarPuntosDeVentas() {
+            try {
+                const puntosDeVentas = await PuntoDeVentaModel.find({ estado: { $ne: "ocupado" } }).exec();
+                return puntosDeVentas.map(pdv => pdv.toObject());
+            } catch (error) {
+                console.error('Error al buscar los puntos de venta:', error);
+                throw error;
+            }
+        }
+
+        async setPdvOcupado(id : string) {
+            try{
+                await PuntoDeVentaModel.findByIdAndUpdate(id, { estado: "ocupado" });
+            }catch (error) {
+                console.error('Error al modificar pdv', error);
                 throw error;
             }
         }

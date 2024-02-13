@@ -32,7 +32,9 @@ export class AuthController {
         if (usuario && infoSucursal && infoPuntoDeVenta && infoPuntoDeVenta.getEstado() === "disponible") {
             // Crear y retornar la sesión
             const sesion = this.crearSesion(usuario, infoSucursal, infoPuntoDeVenta);
-            infoPuntoDeVenta.setEstado("ocupado");
+            
+           
+            this.authService.setPuntoDeVentaOcupado(infoPuntoDeVenta);
             return sesion;
         } else {
             // Devolver un error si los datos son inválidos o el punto de venta no está disponible
@@ -53,4 +55,7 @@ export class AuthController {
     return Sesion.obtenerInstancia(usuario, puntoDeVenta ,sucursal);
 
   }
+
+
+  
 }

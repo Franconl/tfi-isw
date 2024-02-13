@@ -76,7 +76,10 @@ export class ArticuloService{
         try{
             const articulo  = await this.articuloRepository.buscarArticulo({id});
 
-            console.log(sucursalId,'artservice')
+            if(!articulo){
+                console.error('articulo no entoncerado');
+                return null;
+            }
             const inventario = await this.articuloRepository.buscarInventario({articulo, sucursalId})
             
             return {articulo , inventario};

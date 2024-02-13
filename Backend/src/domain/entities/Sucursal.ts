@@ -1,11 +1,10 @@
 export class Sucursal {
-    private id : string;
+    private id! : string;
     private nombre : string;
     private ciudad : string;
     private telefono : number;
     
-    constructor(id : string, nombre : string, ciudad : string, telefono : number){
-        this.id = id;
+    constructor( nombre : string, ciudad : string, telefono : number){
         this.ciudad = ciudad;
         this.nombre = nombre;
         this.telefono = telefono;

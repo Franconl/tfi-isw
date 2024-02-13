@@ -7,13 +7,21 @@
 
 ### http://tu-servidor.com/inicio?user=nombre_usuario&pass=contrasena&sucursal=sucursal_nombre&puntoDeVenta=123
 
-POST {{BASE_API}}/?user=pepe&pass=1234&sucursal=1&puntoDeVenta=1
+POST {{BASE_API}}/
+Content-Type: application/json
+
+{
+    "user" : "Franco",
+    "pass" : "Franco",
+    "sucursal" : "65c923f5229d4ff6cd26c860",
+    "puntoDeVenta" : "65cb8d06d9fcb1fb2fb0a1ed"
+}
 
 
 
 ### Crear Venta
 
-POST {{BASE_API}}/venta?dni=1234
+POST {{BASE_API}}/venta?dni=11111111
 
 
 ### Buscar Articulo e inventario diponible
@@ -46,7 +54,8 @@ Content-Type: application/json
 ### Confirmar pago tarjeta
 POST {{BASE_API}}/venta/tarjeta/confirmar?monto=2000
 
-
+### finalizarVenta
+POST {{BASE_API}}/venta/finalizar
 
 ### Crear Articulo
 
@@ -90,3 +99,6 @@ Content-Type: application/json
 ### buscar articulo
 
 GET {{BASE_API}}/articulo?id=65c91913a2929dfba633b72b
+
+### ASIGNAR CLIENTE
+POST {{BASE_API}}/venta/cliente?dni=12345678

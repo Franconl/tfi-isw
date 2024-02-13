@@ -23,7 +23,13 @@ export class UsuarioMongo implements IUsuarioRepository {
     async obtenerUsuarioPorUsuario(usuario: string): Promise<any> {
         try {
             const usuarioEncontrado = await UsuarioModel.findOne({ usuario }).exec();
-            return usuarioEncontrado; 
+            if(!usuarioEncontrado?.usuario || !usuarioEncontrado.contraseña || !usuarioEncontrado.permisos){
+                return null;
+            }
+            const usuarioResponse : Usuario = new Usuario(usuarioEncontrado.usuario,usuarioEncontrado.contraseña, usuarioEncontrado.permisos);
+
+            return usuarioResponse;
+             
         } catch (error) {
             console.error('Error al obtener el usuario por su nombre de usuario:', error);
             return null; // Hubo un error

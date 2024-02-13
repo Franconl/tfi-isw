@@ -3,6 +3,8 @@ import { Request, Response } from "express";
 import { Inventario } from "../../domain/entities/Inventario";
 import { Venta } from "../../domain/entities/Venta";
 import { LineaDeVenta } from "../../domain/entities/LineaDeVenta";
+import { responseEncoding } from "axios";
+import { Cliente } from "../../domain/entities/Cliente";
 
 export class VentaServiceController{
     private ventaService : VentaService;
@@ -49,7 +51,58 @@ export class VentaServiceController{
         }
     }
       
-    public finalizarVenta(){
-        this.ventaService.finalizarVenta();
+    public async finalizarVenta(req: Request , res : Response){
+        try{
+            await this.ventaService.finalizarVenta();
+        }catch(error) {
+            // Manejar el error y responder con un mensaje de error
+            res.status(500).json({ mensaje: 'Error interno del servidor' });
+            return null;
+        }
+    }
+
+    public async setCliente(req: Request , res : Response){
+        const dni = parseInt(req.query.dni as string);
+        try{
+            const response = await this.ventaService.setCliente(dni)
+            if(!response){
+                res.status(404).json({ mensaje: 'Error al buscar Cliente' });
+            }
+            return response
+        }catch (error) {
+            // Manejar el error y responder con un mensaje de error
+            res.status(500).json({ mensaje: 'Error interno del servidor' });
+            return null;
+        }
+    }
+
+    public async crearCliente(req: Request , res : Response){
+        const cliente : Cliente = req.body as Cliente;
+        try{
+            const response = await this.ventaService.crearCliente(cliente)
+            if(!response){
+                res.status(404).json({ mensaje: 'Error al crear Cliente' });
+            }
+            return response
+        }catch (error) {
+            // Manejar el error y responder con un mensaje de error
+            res.status(500).json({ mensaje: 'Error interno del servidor' });
+            return null;
+        }
+    }
+
+    public setPago(req: Request , res : Response){
+        const tipo = req.body.tipo as string;
+        try{
+            const response = this.ventaService.setPago(tipo);
+            if(!response){
+                res.status(404).json({ mensaje: 'Error al asignar tipo de pago' });
+            }
+            return response
+        }catch (error) {
+            // Manejar el error y responder con un mensaje de error
+            res.status(500).json({ mensaje: 'Error interno del servidor' });
+            return null;
+        }
     }
 }

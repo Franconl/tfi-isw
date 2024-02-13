@@ -1,18 +1,18 @@
 import express from "express";
-import { UsuarioMock } from "../../repositroy/UsuarioMock";
 import { AuthService } from "../../aplication/AuthService";
-import { SucursalMock } from "../../repositroy/SucursalMock";
 import { AuthController } from "../controllers/AuthController";
 import { Sesion } from "../../domain/entities/Sesion";
 import { ConexionAfipService } from "../../aplication/ConexionAfipService";
 import { AfipServiceController } from "../controllers/AfipServiceController";
+import { UsuarioMongo } from "../../repositroy/usuario.mongo";
+import { ArticuloMongo } from "../../repositroy/articulo.mongo";
 
 const router = express.Router();
 
-const userRepo = new UsuarioMock();
-const sucursalRepo = new SucursalMock();
+const userRepo = new UsuarioMongo();
+const artRepo = new ArticuloMongo();
 
-const authService = new AuthService(userRepo,sucursalRepo);
+const authService = new AuthService(userRepo,artRepo);
 
 const authController = new AuthController(authService);
 

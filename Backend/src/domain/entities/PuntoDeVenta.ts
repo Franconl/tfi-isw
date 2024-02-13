@@ -1,13 +1,15 @@
 import { Sucursal } from "./Sucursal";
 
 export class PuntoDeVenta {
+    private id : string
     private numero: number;
     private estado: string;
     private sucursal : Sucursal;
   
-    constructor(numero: number,sucursal : Sucursal) {
+    constructor(id : string, numero: number,sucursal : Sucursal, estado : string) {
+      this.id = id;
       this.numero = numero;
-      this.estado = "disponible";
+      this.estado = estado;
       this.sucursal = sucursal;
     }
   
@@ -33,5 +35,9 @@ export class PuntoDeVenta {
       }else console.error("estado incorrecto");
 
     }
+    getId(){
+      return this.id;
+    }
+    
   }
   

@@ -22,7 +22,7 @@ var afipService;
 var tarjetaService : ConexionTarjetaService;
 var tarjetaController : TarjetaServiceController;
 
-
+// CREAR NUEVA VENTA
   router.post('/venta', async (req, res) => {
     try {
 
@@ -38,6 +38,17 @@ var tarjetaController : TarjetaServiceController;
     }
   });
 
+  //CREAR NUEVO CLIENTE (ENVIAR OBJETO CLIENTE)
+  router.put('/cliente', async (req, res) => {
+    try{ 
+        const response = await ventaCtrl.crearCliente(req,res);
+        res.status(200).send(response);
+    }catch(error) {
+      res.status(500).json({ mensaje: 'Error interno del servidor' });
+    }
+  });
+
+  // SELECCIONAR INVENTARIO DE ARTICULO
   router.post('/venta/seleccionar', async (req, res) => {
     try{ 
         const response = await ventaCtrl.seleccionarInventario(req,res);
@@ -47,6 +58,28 @@ var tarjetaController : TarjetaServiceController;
     }
   });
 
+
+  // ASIGNAR CLIENTE A LA VENTA(POR DEFECTO CLIENTE GENERICO)
+  router.post('/venta/cliente', async (req, res) => {
+    try{ 
+        const response = await ventaCtrl.setCliente(req,res);
+        res.status(200).send(response);
+    }catch(error) {
+      res.status(500).json({ mensaje: 'Error interno del servidor' });
+    }
+  });
+
+//INDICAR TIPO DE PAGO
+router.post('/venta/pago', async (req, res) => {
+  try{ 
+      const response = ventaCtrl.setPago(req,res);
+      res.status(200).send(response);
+  }catch(error) {
+    res.status(500).json({ mensaje: 'Error interno del servidor' });
+  }
+});
+
+  //SOLICITAR TOKEN DE PAGO CON TARJETA
   router.post('/venta/tarjeta', async (req, res) => {
     try{
       tarjetaService = new ConexionTarjetaService(ventaService);
@@ -58,10 +91,11 @@ var tarjetaController : TarjetaServiceController;
     }
   });
 
+
+  // CONFIRMAR PAGO CON TARJETA
   router.post('/venta/tarjeta/confirmar', async (req,res) =>{
     try{
       const response = await tarjetaController.confirmarPago(req,res);
-      ventaCtrl.finalizarVenta();
       res.status(200).send(response);
     }catch(error) {
       res.status(500).json({ mensaje: 'Error interno del servidor' });
@@ -78,5 +112,12 @@ var tarjetaController : TarjetaServiceController;
     }
   })
 
+router.post('/venta/finalizar' , async (req,res) =>{
+    try{
+       await ventaCtrl.finalizarVenta(req,res);
+    }catch(error) {
+      res.status(500).json({ mensaje: 'Error interno del servidor' });
+    }
+  })
 
 export default router;

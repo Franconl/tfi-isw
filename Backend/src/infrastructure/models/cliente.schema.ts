@@ -11,7 +11,6 @@ enum CondicionTributaria {
 
 // Definición de la interfaz para el documento Cliente en MongoDB
 interface ICliente extends Document {
-    id: string;
     nombre: string;
     apellido: string;
     telefono: string;
@@ -25,7 +24,6 @@ interface ICliente extends Document {
 
 // Definición del esquema para el Cliente
 const ClienteSchema: Schema = new Schema({
-    id: { type: String, required: true },
     nombre: { type: String, required: true },
     apellido: { type: String, required: true },
     telefono: { type: String, required: true },
@@ -38,4 +36,4 @@ const ClienteSchema: Schema = new Schema({
 });
 
 // Define y exporta el modelo de Cliente
-export const ClienteModel = mongoose.model<ICliente>('Cliente', ClienteSchema);
+export const ClienteModel = mongoose.model<ICliente>('clientes', ClienteSchema);

@@ -12,7 +12,7 @@ export class Cliente {
   private cuil? : number;
   private cuit? : number;
 
-  constructor(id : string, nombre: string, apellido: string, telefono: string, email: string, domicilio: string, options: { dni?: number; cuil?: number; cuit?: number }) {
+  constructor(id : string, nombre: string, apellido: string, telefono: string, email: string, domicilio: string,condicion : CondicionTributaria, options: { dni?: number; cuil?: number; cuit?: number }) {
     this.id = id;
     this.nombre = nombre;
     this.apellido = apellido;
@@ -22,6 +22,7 @@ export class Cliente {
     this.dni = options.dni; 
     this.cuil = options.cuil;  
     this.cuit = options.cuit;
+    this.condicion = condicion;
   }
 
   

@@ -2,7 +2,7 @@ import { TipoDeComprobante } from "../entities/TipoDeComprobante";
 import { Usuario } from "../entities/Usuario";
 import { PuntoDeVenta } from "../entities/PuntoDeVenta";
 import { LineaDeVenta } from "../entities/LineaDeVenta";
-//import { Pago } from "../entities/Pago";
+import { Pago } from "../entities/Pago";
 import { Cliente } from "../entities/Cliente";
 import { v4 as uuid } from "uuid";
 import { Comprobante } from "./Comprobante";
@@ -17,7 +17,7 @@ export class Venta {
   private usuario: Usuario;
   private puntoDeVenta: PuntoDeVenta;
   private lineasDeVenta: LineaDeVenta[];
-  //private pago: Pago;
+  private pago!: Pago;
   private cliente: Cliente;
   private comprobante! : Comprobante;
 
@@ -120,5 +120,13 @@ export class Venta {
 
   setComprobante(comprobante : Comprobante){
     this.comprobante = comprobante;
+  }
+
+  setPago(pago : Pago){
+    this.pago = pago;
+  }
+
+  getPago(){
+    return this.pago;
   }
 }
