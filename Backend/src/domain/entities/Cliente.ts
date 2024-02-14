@@ -1,7 +1,7 @@
 import { CondicionTributaria } from "./CondicionTributaria";
 
 export class Cliente {
-  private id : string;
+  private id? : string;
   private nombre: string;
   private apellido: string;
   private telefono: string;
@@ -12,7 +12,7 @@ export class Cliente {
   private cuil? : number;
   private cuit? : number;
 
-  constructor(id : string, nombre: string, apellido: string, telefono: string, email: string, domicilio: string,condicion : CondicionTributaria, options: { dni?: number; cuil?: number; cuit?: number }) {
+  constructor( nombre: string, apellido: string, telefono: string, email: string, domicilio: string,condicion : CondicionTributaria, options: { dni?: number; cuil?: number; cuit?: number },id? : string,) {
     this.id = id;
     this.nombre = nombre;
     this.apellido = apellido;
@@ -25,7 +25,9 @@ export class Cliente {
     this.condicion = condicion;
   }
 
-  
+  getId(){
+    return this.id;
+  }
 
   // Getter para nombre
   getNombre(): string {

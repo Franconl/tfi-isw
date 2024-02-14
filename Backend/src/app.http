@@ -29,10 +29,18 @@ POST {{BASE_API}}/venta?dni=11111111
 GET {{BASE_API}}/inventario?id=65c91913a2929dfba633b72b&sucursalId=65c923f5229d4ff6cd26c860
 
 ### Seleccionar Inventario
-POST {{BASE_API}}/venta/seleccionar?cantidad=1&id=65ca4d63f19d64616b337ea5
+POST {{BASE_API}}/venta/seleccionar?cantidad=1&id=65cd023b7f39c19ab573ccd3
 
 ### finalizar seleccion articulos
 POST {{BASE_API}}/venta/cae
+
+### indicar tipó de pago
+POST {{BASE_API}}/venta/pago
+Content-Type: application/json
+
+{
+    "tipo" : "efectivo"
+}
 
 ### Solicitar Token Tarjeta
 
@@ -58,13 +66,12 @@ POST {{BASE_API}}/venta/tarjeta/confirmar?monto=2000
 POST {{BASE_API}}/venta/finalizar
 
 ### Crear Articulo
-
 PUT {{BASE_API}}/articulo
 Content-Type: application/json
 
 {
-  "descripcion": "Camiseta de algodón",
-  "costo": 10000,
+  "descripcion": "short deportivo",
+  "costo": 7900,
   "margenDeGanancia": 20,
   "tipoDetalle": "65c8fc477e268ad35137fe1b",
   "categoria": "65c8fbbf7e268ad35137fe15",
@@ -102,3 +109,28 @@ GET {{BASE_API}}/articulo?id=65c91913a2929dfba633b72b
 
 ### ASIGNAR CLIENTE
 POST {{BASE_API}}/venta/cliente?dni=12345678
+
+### CREAR CLIENTE
+PUT {{BASE_API}}/cliente
+Content-Type: application/json
+
+{
+    "nombre": "Jose",
+    "apellido": "Gomez",
+    "telefono" : "454342",
+    "email" : "jose@gmail.com",
+    "domicilio" : "concepcion",
+    "dni" : 23234352,
+    "condicion" : "M"
+}
+
+
+### buscar marcas
+GET {{BASE_API}}/marcas
+
+### buscar tipo talles
+GET {{BASE_API}}/tipotalles
+
+
+### buscar categorias
+GET {{BASE_API}}/categorias

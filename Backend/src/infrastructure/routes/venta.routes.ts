@@ -5,16 +5,16 @@ import { VentaServiceController } from '../controllers/VentaServiceController';
 import { sesion } from './auth.routes';
 import { TarjetaServiceController } from '../controllers/TarjetaServiceController';
 import { ConexionTarjetaService } from '../../aplication/ConexionSistTarjetaService';
-import { VentaRepository } from '../../repositroy/VentaRepository';
 import { afipServiceController } from "../routes/auth.routes";
 import { ArticuloMongo } from '../../repositroy/articulo.mongo';
 import { ClienteMongo } from '../../repositroy/cliente.mongo';
+import { VentaMongo } from '../../repositroy/venta.mongo';
 
 const router = express.Router();
 
 const ArticuloRepo = new ArticuloMongo();
 const ClienteRepo = new ClienteMongo();
-const ventaRepo = new VentaRepository()
+const ventaRepo = new VentaMongo();
 var ventaService : VentaService = new VentaService(ClienteRepo, ArticuloRepo, sesion, ventaRepo);
 var ventaCtrl = new VentaServiceController(ventaService);
 var afipService;
@@ -107,6 +107,7 @@ router.post('/venta/pago', async (req, res) => {
   router.post('/venta/cae' , async (req,res) =>{
     try{
       const response = await afipServiceController.solicitarCae(ventaService);
+      res.status(200).send(response);
     }catch(error) {
       res.status(500).json({ mensaje: 'Error interno del servidor' });
     }

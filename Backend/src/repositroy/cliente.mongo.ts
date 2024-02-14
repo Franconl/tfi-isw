@@ -7,20 +7,11 @@ export class ClienteMongo implements IClienteRepository {
     // Método para crear un nuevo cliente
     async crearCliente(nuevoCliente: Cliente): Promise<any> {
         try {
-            
             // Crear una instancia del modelo Cliente
-            const cliente = new ClienteModel({
-                nombre : nuevoCliente.getNombre(),
-                apellido : nuevoCliente.getApellido(),
-                telefono : nuevoCliente.getTelefono(),
-                email : nuevoCliente.getEmail(),
-                domicilio : nuevoCliente.getDomicilio(),
-                dni : nuevoCliente.getDni(),
-                cuil : nuevoCliente.getCuil(),
-                cuit : nuevoCliente.getCuit()
-            });
+            const cliente = new ClienteModel(nuevoCliente);
 
             await cliente.save();
+            console.log('client creado');
             return cliente; 
         } catch (error) {
             console.error('Error al crear el cliente:', error);
@@ -44,9 +35,9 @@ export class ClienteMongo implements IClienteRepository {
                     return null;
             }
             
-            const cliente = new Cliente(clienteMongo._id.toString(),clienteMongo.nombre,clienteMongo.apellido
+            const cliente = new Cliente(clienteMongo.nombre,clienteMongo.apellido
                 ,clienteMongo.telefono,clienteMongo.email,clienteMongo.domicilio,
-                clienteMongo.condicion,{dni : dni, cuit : clienteMongo.cuit, cuil : clienteMongo.cuil})
+                clienteMongo.condicion,{dni : dni, cuit : clienteMongo.cuit, cuil : clienteMongo.cuil},clienteMongo._id.toString(),)
             
             return cliente;
         } catch (error) {

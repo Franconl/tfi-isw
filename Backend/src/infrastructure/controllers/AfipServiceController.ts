@@ -61,6 +61,7 @@ export class AfipServiceController {
                         this.afipService.getSesion().setNumeroComprobanteA(parseInt(numero) + 1);
                     } else if (descripcion === 'Factura B') {
                         this.afipService.getSesion().setNumeroComprobanteB(parseInt(numero) + 1);
+                        console.log(numero)
                     }
 
                     console.log('Ultimos comprobantes solicitados')
@@ -76,6 +77,7 @@ export class AfipServiceController {
 
     public async solicitarCae(ventaService : VentaService){
         var venta = ventaService.getVenta();
+        console.log(venta);
         try{
             if(venta){
                 const xmlResponse = await this.afipService.solicitarCae(venta);
@@ -89,12 +91,22 @@ export class AfipServiceController {
                 const fechaDeVencimiento = data['s:Envelope']['s:Body'][0]['SolicitarCaeResponse'][0]['SolicitarCaeResult'][0]['a:FechaDeVencimiento'][0];
                 const observacion = data['s:Envelope']['s:Body'][0]['SolicitarCaeResponse'][0]['SolicitarCaeResult'][0]['a:Observacion'][0];
                 const tipoComprobante = data['s:Envelope']['s:Body'][0]['SolicitarCaeResponse'][0]['SolicitarCaeResult'][0]['a:TipoComprobante'][0];
-
+                console.log(cae,error,estado,tipoComprobante,'estado')
                 if(estado == 'Aprobada' || estado == 'AprobadaParcialmente'){
                     console.log('Venta Aprobada por AFIP');
                     ventaService.crearComprobante(cae);
+                    this.afipService.setUltimosComprobantes(tipoComprobante);
+                    return {cae,error,estado,tipoComprobante}
+                }else{
+                    let n = 0;
+                    while(n > 1){
+                        this.solicitarToken();
+                        this.solicitarCae(ventaService);
+                        n++;
+                    }
+
                 }
-                return {cae,error,estado,tipoComprobante}
+                return null;
             }
         }catch(error) {
             console.error('Error al solicitar comprobantes:', error);

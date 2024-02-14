@@ -66,7 +66,6 @@ export class ArticuloController {
         const id = req.query.id as string;
         try{
             const response = await this.articuloService.buscarArticulo(id);
-            console.log(response,'articuloctrl')
             return response
         }catch (error) {
             console.error('Error al seleccionar el artículo:', error);
@@ -80,7 +79,6 @@ export class ArticuloController {
         const sucursalId = req.query.sucursalId as string;
         try{
             const response = await this.articuloService.buscarArticuloeInvantario(id,sucursalId);
-            console.log(response,'articuloctrl')
             return response
         }catch (error) {
             console.error('Error al seleccionar el artículo:', error);
@@ -88,5 +86,38 @@ export class ArticuloController {
             return null;
         }
     }
-    
+
+    public async buscarMarcas(req : Request , res : Response){
+        try{
+            const response = await this.articuloService.buscarMarcas();
+            return response;
+        }catch(error) {
+        console.error('Error al buscar marca:', error);
+        res.status(500).json({ mensaje: 'Error interno del servidor' });
+        return null;
+        }   
+    }
+
+    public async buscarTiposTalle(req : Request , res : Response){
+        try{
+            const response = await this.articuloService.buscarTiposTalle();
+            return response;
+        }catch(error) {
+        console.error('Error al buscar marca:', error);
+        res.status(500).json({ mensaje: 'Error interno del servidor' });
+        return null;
+        }   
+    }
+
+
+    public async buscarCategorias(req : Request , res : Response){
+        try{
+            const response = await this.articuloService.buscarCategorias();
+            return response;
+        }catch(error) {
+        console.error('Error al buscar marca:', error);
+        res.status(500).json({ mensaje: 'Error interno del servidor' });
+        return null;
+        }   
+    }
 }

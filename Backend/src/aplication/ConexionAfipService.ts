@@ -85,8 +85,9 @@ export class ConexionAfipService {
 
         if(tipoDeComprobante == 'FacturaA'){
           numero = this.sesion.getNumeroComprobanteA();
-        }else numero = this.sesion.getNumeroComprobanteB();
-    
+        }else{
+          numero = this.sesion.getNumeroComprobanteB();
+        }
         const tipoDocumento = this.getTipoDocumento(cliente);
         const numDocumento = this.getNumDocumento(tipoDocumento, cliente);
 
@@ -190,5 +191,13 @@ export class ConexionAfipService {
       if(tipo == 'FacturaA'){
         this.sesion.setNumeroComprobanteA(+1);
       }else this.sesion.setNumeroComprobanteB(+1);
+    }
+
+    setUltimosComprobantes(tipoDeComprobante : string){
+      if(tipoDeComprobante == 'FacturaA'){
+        this.sesion.setNumeroComprobanteA(this.sesion.getNumeroComprobanteA() + 1);
+      }else{
+        this.sesion.setNumeroComprobanteB(this.sesion.getNumeroComprobanteB() + 1);
+      }
     }
 }

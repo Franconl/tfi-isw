@@ -129,4 +129,17 @@ export class Venta {
   getPago(){
     return this.pago;
   }
+
+  getComprobante(){
+    return this.comprobante;
+  }
+
+  getPuntoDeVenta(){
+    return this.puntoDeVenta;
+  }
+
+  getUsuario(){
+    return this.usuario;
+  }
+
 }

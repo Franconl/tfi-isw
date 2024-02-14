@@ -459,4 +459,13 @@ export class ArticuloMongo implements IArticuloRepository {
                 throw error;
             }
         }
+
+        async setInventarioCantidad(id : string,cantidad : number) : Promise<void>{
+            try{
+                await InventarioModel.findByIdAndUpdate(id ,{cantidad : cantidad});
+            }catch (error) {
+                console.error('Error al modificar inventario', error);
+                throw error;
+            }
+        }
 }

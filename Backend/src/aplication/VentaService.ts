@@ -111,15 +111,18 @@ export class VentaService {
       const inventario = await this.articuloRepository.busarInventarioId({id});
 
       if(inventario && inventario.getCantidad() > 0){
-        
-        const precio = inventario.getArticulo().obtenerMontoTotal();
-        const lineadeVenta = new LineaDeVenta(inventario, cantidad, precio);
+
 
         if(this.venta){
-          this.venta.agregarLineaDeVenta(lineadeVenta);
-        
 
-          inventario.setCantidad(inventario.getCantidad() - 1);
+          inventario.setCantidad(inventario.getCantidad() - cantidad);
+
+          await this.articuloRepository.setInventarioCantidad(id,inventario.getCantidad());
+
+          const precio = inventario.getArticulo().obtenerMontoTotal();
+          const lineadeVenta = new LineaDeVenta(inventario, cantidad, precio);
+
+          this.venta.agregarLineaDeVenta(lineadeVenta);
 
           return this.venta.getLineaDeVenta();
 
@@ -141,9 +144,9 @@ export class VentaService {
     if(this.venta){
       const venta = this.venta
       venta.setEstado("Aprobado");
-      this.ventaRepository.insertVenta({ venta });
-
+      const response = await this.ventaRepository.insertVenta({ venta });
       this.resetVenta();
+      return response;
     }
   }
 

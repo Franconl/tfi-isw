@@ -53,7 +53,8 @@ export class VentaServiceController{
       
     public async finalizarVenta(req: Request , res : Response){
         try{
-            await this.ventaService.finalizarVenta();
+            const response = await this.ventaService.finalizarVenta();
+            return response;
         }catch(error) {
             // Manejar el error y responder con un mensaje de error
             res.status(500).json({ mensaje: 'Error interno del servidor' });

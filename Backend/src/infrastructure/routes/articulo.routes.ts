@@ -62,4 +62,32 @@ router.get('/inventario', async (req, res) => {
     res.status(500).json({ mensaje: 'Error interno del servidor' });
   }
 });
+
+router.get('/marcas', async (req, res) => {
+  try{
+    const response = await articuloCtrl.buscarMarcas(req,res);
+    res.status(200).send(response);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error interno del servidor' });
+  }
+});
+
+router.get('/categorias', async (req, res) => {
+  try{
+    const response = await articuloCtrl.buscarCategorias(req,res);
+    res.status(200).send(response);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error interno del servidor' });
+  }
+});
+
+router.get('/tipotalles', async (req, res) => {
+  try{
+    const response = await articuloCtrl.buscarTiposTalle(req,res);
+    res.status(200).send(response);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error interno del servidor' });
+  }
+});
+
 export default router;

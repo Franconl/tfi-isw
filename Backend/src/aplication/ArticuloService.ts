@@ -89,5 +89,33 @@ export class ArticuloService{
         }
     }
 
+    async buscarMarcas(){
+        try{
+            const response = await this.articuloRepository.buscarMarcas();
+            return response;
+        }catch (error) {
+            console.error('Error al buscar marca:', error);
+            throw error;
+        }
+    }
 
+    async buscarCategorias(){
+        try{
+            const response = await this.articuloRepository.buscarCategorias();
+            return response;
+        }catch (error) {
+            console.error('Error al buscar marca:', error);
+            throw error;
+        }
+    }
+
+    async buscarTiposTalle(){
+        try{
+            const response = await this.articuloRepository.buscarTiposDeTalle();
+            return response;
+        }catch (error) {
+            console.error('Error al buscar marca:', error);
+            throw error;
+        }
+    }
 }
