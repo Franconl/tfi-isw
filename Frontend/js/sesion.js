@@ -3,14 +3,14 @@
   
     // Crear objeto con los valores del formulario
     let formData = {
-      username: document.getElementById("username").value,
-      password: document.getElementById("password").value,
-      sucursal: document.getElementById("inputGroupSelect01").value,
-      puntoVenta: document.getElementById("inputGroupSelect02").value,
+      user : document.getElementById("username").value,
+      pass : document.getElementById("password").value,
+      sucursal : "65c923f5229d4ff6cd26c860",
+      puntoDeVenta : "65cb8d06d9fcb1fb2fb0a1ed",
     };
   
     // Verificar si el usuario y contraseña están vacíos
-    if (!formData.username || !formData.password) {
+    if (!formData.user || !formData.pass) {
       alert("Ensure you input a value in both fields!");
       return; // Termina la ejecución de la función si falta algún campo
     }
@@ -30,10 +30,11 @@
   
   async function postJSON(data) {
     try {
-      const response = await fetch("http://localhost:3002/api", {
+      console.log(data)
+      const response = await fetch("http://localhost:3002/api/", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(data),
       });
