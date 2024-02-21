@@ -3,7 +3,7 @@
 ################################################################################
 
 # Variable con la URL base
-@BASE_API=http://localhost:3001/api
+@BASE_API=http://localhost:3002/api
 
 ### http://tu-servidor.com/inicio?user=nombre_usuario&pass=contrasena&sucursal=sucursal_nombre&puntoDeVenta=123
 
