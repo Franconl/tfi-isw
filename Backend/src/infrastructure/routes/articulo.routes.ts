@@ -90,4 +90,13 @@ router.get('/tipotalles', async (req, res) => {
   }
 });
 
+router.post('/modificar/articulo', async (req, res) => {
+  try{
+    const response = await articuloCtrl.modificarArticulo(req,res);
+    res.status(200).send(response);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error interno del servidor' });
+  }
+});
+
 export default router;
