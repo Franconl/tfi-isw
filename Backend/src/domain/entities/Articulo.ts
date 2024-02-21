@@ -88,6 +88,10 @@ export class Articulo {
       return this.marca;
     }
 
+    getEstado(){
+      return this.estado;
+    }
+
     // Setter para 'marca'
     setMarca(marca: Marca): void {
       this.marca = marca;

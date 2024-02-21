@@ -31,4 +31,5 @@ export interface IArticuloRepository {
     buscarPuntosDeVentas(): Promise<any>;
     setPdvOcupado(id : string) : void
     setInventarioCantidad(id : string,cantidad : number) : Promise<void>
+    modificarArticulo(articulo : Articulo) : Promise<any>
 }

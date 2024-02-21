@@ -80,11 +80,25 @@ export class ArticuloService{
                 console.error('articulo no entoncerado');
                 return null;
             }
+            if(articulo.getEstado() == "no disponible"){
+                console.error('articulo no disponible');
+                return null;
+            }
             const inventario = await this.articuloRepository.buscarInventario({articulo, sucursalId})
             
             return {articulo , inventario};
         }catch (error) {
             console.error('Error al buscar artículo:', error);
+            throw error;
+        }
+    }
+
+    async modificarArticulo(articulo : Articulo){
+        try{
+            const response = await this.articuloRepository.modificarArticulo(articulo);
+            return response;
+        }catch (error) {
+            console.error('Error al modificar artículo:', error);
             throw error;
         }
     }

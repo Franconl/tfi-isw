@@ -87,6 +87,22 @@ export class ArticuloController {
         }
     }
 
+    public async modificarArticulo(req : Request , res : Response){
+        const articulo = req.body as Articulo;
+        try{
+            const response = await this.articuloService.modificarArticulo(articulo);
+            if(!response){
+                res.status(500).json({ mensaje: 'Error al modificar articulo' });
+                return null;
+            }
+            return response;
+        }catch (error) {
+            console.error('Error al seleccionar el artículo:', error);
+            res.status(500).json({ mensaje: 'Error interno del servidor' });
+            return null;
+        }
+    }
+
     public async buscarMarcas(req : Request , res : Response){
         try{
             const response = await this.articuloService.buscarMarcas();

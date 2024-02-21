@@ -468,4 +468,14 @@ export class ArticuloMongo implements IArticuloRepository {
                 throw error;
             }
         }
+
+        async modificarArticulo(articulo : Articulo){
+            try{
+                const response = await ArticuloModel.findOneAndReplace({_id : articulo.getCodigo()},{articulo})
+                return response;
+            }catch (error) {
+                console.error('Error al modificar articulo', error);
+                throw error;
+            }
+        }
 }
