@@ -7,25 +7,44 @@
 
 ### http://tu-servidor.com/inicio?user=nombre_usuario&pass=contrasena&sucursal=sucursal_nombre&puntoDeVenta=123
 
-POST {{BASE_API}}/?user=pepe&pass=1234&sucursal=1&puntoDeVenta=1
+POST {{BASE_API}}/
+Content-Type: application/json
+
+{
+    "user" : "Franco",
+    "pass" : "Franco",
+    "sucursal" : "65c923f5229d4ff6cd26c860",
+    "puntoDeVenta" : "65cb8d06d9fcb1fb2fb0a1ed"
+}
 
 
 
 ### Crear Venta
 
-POST {{BASE_API}}/venta?dni=1234
+POST {{BASE_API}}/venta?dni=11111111
 
 
-### Buscar Articulo
+### Buscar Articulo e inventario diponible
 
-GET {{BASE_API}}/articulo?=1234
+GET {{BASE_API}}/inventario?id=65c91913a2929dfba633b72b&sucursalId=65c923f5229d4ff6cd26c860
 
-### Seleccionar Articulo
-POST {{BASE_API}}/venta/inventario?cantidad=1?id=3297b322-2331-4b27-b6d0-a6d668c9fe2d
+### Seleccionar Inventario
+POST {{BASE_API}}/venta/seleccionar?cantidad=1&id=65cd023b7f39c19ab573ccd3
+
+### finalizar seleccion articulos
+POST {{BASE_API}}/venta/cae
+
+### indicar tipó de pago
+POST {{BASE_API}}/venta/pago
+Content-Type: application/json
+
+{
+    "tipo" : "efectivo"
+}
 
 ### Solicitar Token Tarjeta
 
-GET {{BASE_API}}/venta/tarjeta
+POST {{BASE_API}}/venta/tarjeta
 Content-Type: application/json
 
 {
@@ -41,4 +60,77 @@ Content-Type: application/json
 }
 
 ### Confirmar pago tarjeta
-POST {{BASE_API}}/venta/tarjeta?monto=2000
+POST {{BASE_API}}/venta/tarjeta/confirmar?monto=2000
+
+### finalizarVenta
+POST {{BASE_API}}/venta/finalizar
+
+### Crear Articulo
+PUT {{BASE_API}}/articulo
+Content-Type: application/json
+
+{
+  "descripcion": "short deportivo",
+  "costo": 7900,
+  "margenDeGanancia": 20,
+  "tipoDetalle": "65c8fc477e268ad35137fe1b",
+  "categoria": "65c8fbbf7e268ad35137fe15",
+  "marca": "65c8fbde7e268ad35137fe17"
+}
+
+###crear Categoria
+PUT {{BASE_API}}/categoria
+Content-Type: application/json
+
+{
+    "nombre": "Remera Deportiva"
+}
+
+###crear Marca
+PUT {{BASE_API}}/marca
+Content-Type: application/json
+
+{
+    "nombre": "Puma"
+}
+
+###crear Tipo de Talle
+PUT {{BASE_API}}/tipodetalle
+Content-Type: application/json
+
+{
+    "nombre": "US"
+}
+
+
+### buscar articulo
+
+GET {{BASE_API}}/articulo?id=65c91913a2929dfba633b72b
+
+### ASIGNAR CLIENTE
+POST {{BASE_API}}/venta/cliente?dni=12345678
+
+### CREAR CLIENTE
+PUT {{BASE_API}}/cliente
+Content-Type: application/json
+
+{
+    "nombre": "Jose",
+    "apellido": "Gomez",
+    "telefono" : "454342",
+    "email" : "jose@gmail.com",
+    "domicilio" : "concepcion",
+    "dni" : 23234352,
+    "condicion" : "M"
+}
+
+
+### buscar marcas
+GET {{BASE_API}}/marcas
+
+### buscar tipo talles
+GET {{BASE_API}}/tipotalles
+
+
+### buscar categorias
+GET {{BASE_API}}/categorias

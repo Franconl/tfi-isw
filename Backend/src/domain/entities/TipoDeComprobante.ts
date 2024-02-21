@@ -1,4 +1,4 @@
 export enum TipoDeComprobante{
-    FACTURA_A = "Factura A",
-    FACTURA_B = "Factura B"
+    FACTURA_A = "FacturaA",
+    FACTURA_B = "FacturaB"
 }

@@ -4,15 +4,21 @@ import { Venta } from "../domain/entities/Venta";
 import { VentaService } from "./VentaService";
 
 export class ConexionTarjetaService {
-  private venta : Venta;
+  private venta! : Venta;
 
-  constructor(ventaService : VentaService) {
-    this.venta = ventaService.getVenta();
+  constructor(ventaService: VentaService) {
+
+    const venta = ventaService.getVenta();
+
+    if (venta instanceof Venta) {
+      this.venta = venta;
+    } else {
+      console.error('La venta obtenida no es una instancia de Venta');
+    }
   }
 
   public async solicitarToken(tarjetaData: TarjetaData): Promise<any> {
     try {
-      console.log(this.venta,'<-------')
       const requestOptions = {
         method: 'POST',
         headers: {
@@ -47,23 +53,25 @@ export class ConexionTarjetaService {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          site_transaction_id: this.venta.getId(),
-          payment_method_id: 1,
-          token: token,
-          bin: "450799",
-          amount: monto,
-          currency: "ARS",
-          installments: 1,
-          description: "",
-          payment_type: "single",
-          establishment_name: "single",
-          sub_payments: [{
-            site_id: "",
-            amount: monto,
-            installments: null
+          "site_transaction_id" : this.venta.getId(),
+          "payment_method_id" : 1,
+          "token" : token,
+          "bin" : "450799",
+          "amount" : monto,
+          "currency" : "ARS",
+          "installments" : 1,
+          "description" : "",
+          "payment_type" : "single",
+          "establishment_name" : "single",
+          "sub_payments": [{
+          "site_id": "",
+          "amount": monto,
+          "installments": null
           }]
-        })
+          }
+          )
       };
+
 
       const response = await fetch('https://developers.decidir.com/api/v2/payments', requestOptions);
 

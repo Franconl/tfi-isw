@@ -10,8 +10,9 @@ export class Articulo {
     private tipoDetalle : TipoDeTalle;
     private categoria : Categoria
     private marca : Marca;
+    private estado : string;
   
-    constructor(codigo: string, descripcion: string, costo: number, margenDeGanancia: number, tipoDeTalle : TipoDeTalle, categoria : Categoria, marca : Marca) {
+    constructor(codigo: string, descripcion: string, costo: number, margenDeGanancia: number, tipoDeTalle : TipoDeTalle, categoria : Categoria, marca : Marca, estado : string) {
       this.codigo = codigo;
       this.descripcion = descripcion;
       this.costo = costo;
@@ -19,6 +20,7 @@ export class Articulo {
       this.tipoDetalle = tipoDeTalle;
       this.categoria = categoria;
       this.marca = marca;
+      this.estado = estado;
     }
 
     // Getter para 'codigo'
@@ -98,7 +100,7 @@ export class Articulo {
     
       obtenerMontoIVA(): number {
         const montoNeto = this.obtenerMontoNeto();
-        const montoIVA = montoNeto * 0.12; // Suponiendo un 12% de IVA, ajustar según sea necesario
+        const montoIVA = montoNeto * 0.21; 
         return montoIVA;
       }
     

@@ -14,10 +14,10 @@ export class TarjetaServiceController{
       try{
         const monto = parseInt(req.query.monto as string);
         const response = await this.tarjetaService.confirmarPago(this.token,monto);
-        res.status(200).json({ token: response, mensaje: 'Token solicitado exitosamente'});
+        res.status(200).json({ token: response, mensaje: 'Pago Confirmado'});
       } catch (error) {
-        // Manejar los errores y enviar una respuesta de error al cliente
-        console.error('Error al solicitar el token:', error);
+
+        console.error('Error al Confirmar Pago:', error);
         res.status(500).json({ mensaje: 'Error interno del servidor' });
       }
     }
@@ -29,9 +29,10 @@ export class TarjetaServiceController{
             const tarjeta: TarjetaData = req.body as TarjetaData;
             const response = await this.tarjetaService.solicitarToken(tarjeta);
             this.token = response;
+
             res.status(200).json({ token: response, mensaje: 'Token solicitado exitosamente'});
         } catch (error) {
-          // Manejar los errores y enviar una respuesta de error al cliente
+          
           console.error('Error al solicitar el token:', error);
           res.status(500).json({ mensaje: 'Error interno del servidor' });
         }

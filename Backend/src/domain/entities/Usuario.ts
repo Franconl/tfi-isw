@@ -1,13 +1,15 @@
-import { Sesion } from "./Sesion";
 
 export class Usuario {
+    private id? : string; 
     private username: string;
     private password: string;
+    private permisos : string;
 
   
-    constructor(username: string, password: string) {
+    constructor(username: string, password: string, permisos : string, id? : string) {
       this.username = username;
       this.password = password;
+      this.permisos = permisos;
     }
   
     // Getter para username
@@ -28,6 +30,10 @@ export class Usuario {
     // Setter para password
     setPassword(password: string): void {
       this.password = password;
+    }
+
+    getId(){
+      return this.id;
     }
   }
   

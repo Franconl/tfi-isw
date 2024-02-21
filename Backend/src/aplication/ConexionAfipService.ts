@@ -1,19 +1,17 @@
-/*import axios from "axios";
+import axios from "axios";
 import { Venta } from "../domain/entities/Venta";
 import { TipoDeComprobante } from "../domain/entities/TipoDeComprobante";
 import { Sesion } from "../domain/entities/Sesion";
+import { VentaService } from "./VentaService";
+import { parse, differenceInDays } from 'date-fns';
+import { Cliente } from "../domain/entities/Cliente";
 
 export class ConexionAfipService {
-    private url : string;
-    private codigo : string;
     private sesion : Sesion;
-    private venta : Venta;
+    private url : string = "http://istp1service.azurewebsites.net/LoginService.svc";
 
-    constructor(url : string = "http://istp1service.azurewebsites.net/LoginService.svc?singleWsdl", codigo : string, sesion : Sesion, venta : Venta){
-        this.url = url;
-        this.codigo = codigo;
+    constructor(sesion : Sesion){
         this.sesion = sesion;
-        this.venta = venta;
     }
 
     getSesion() : Sesion {
@@ -23,14 +21,14 @@ export class ConexionAfipService {
     public async solicitarToken() : Promise<any> {
         const headers = {
             'Content-Type': 'text/xml;charset=UTF-8',
-            'SOAPAction': 'http://ISTP1.Service.Contracts.Service/LoginService/SolicitarAutorizacion',
+            'SOAPAction': 'http://ISTP1.Service.Contracts.Service/ILoginService/SolicitarAutorizacion',
             };
 
             const xmlBody = `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:istp="http://ISTP1.Service.Contracts.Service">
             <soapenv:Header/>
             <soapenv:Body>
               <istp:SolicitarAutorizacion>
-                <codigo>${this.codigo}</codigo>
+                <istp:codigo>C4DA2C56-362C-491D-BECE-347FB4982B7B</istp:codigo>
               </istp:SolicitarAutorizacion>
             </soapenv:Body>
           </soapenv:Envelope>`
@@ -45,17 +43,18 @@ export class ConexionAfipService {
 
         }
     
-    public async solicitarUltimoComprobante(token : string) : Promise<any> {
+    public async solicitarUltimoComprobante() : Promise<any> {
+      const token = this.sesion.getTokenAfip();
         const headers = {
-            'Content-Type' : 'text/xml;charset=UFT-8',
-            'SOAPAction': 'http://ISTP1.Service.Contracts.Service/LoginService/SolicitarUltimosComprobantes'
+            'Content-Type' : 'text/xml;charset=UTF-8',
+            'SOAPAction': 'http://ISTP1.Service.Contracts.Service/ILoginService/SolicitarUltimosComprobantes'
         }
 
         const xmlBody = `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:istp="http://ISTP1.Service.Contracts.Service">
         <soapenv:Header/>
         <soapenv:Body>
           <istp:SolicitarUltimosComprobantes>
-            <token>${token}</token>
+            <istp:token>${token}</istp:token>
           </istp:SolicitarUltimosComprobantes>  
         </soapenv:Body>
       </soapenv:Envelope>`
@@ -70,62 +69,59 @@ export class ConexionAfipService {
 
     }
 
-    getNumComprobante() : number {
-        switch(this.venta.getTipoDeComprobante()){
-            case TipoDeComprobante.FACTURA_A:
-                return 1;
-            case TipoDeComprobante.FACTURA_B:
-                return 6;
-        }
-    }
-
-    public async solicitarCae() : Promise<any> {
+    public async solicitarCae(venta : Venta) : Promise<any> {
+        const cliente = venta.getCliente();
 
         const token = this.sesion.getTokenAfip();
-        const fecha = this.venta.getFecha();
-        const importeIva = this.venta.getImporteIva();
-        const importeNeto = this.venta.getImporteNeto();
-        const importeTotal = this.venta.getImporteTotal();
-        if(!this.validarImporteTotal() || !this.validarFecha(fecha)) return console.error('Datos invalidos');
-        const tipoDeComprobante = this.getNumComprobante();
+        const fecha = venta.getFecha();
+        const importeIva = venta.getImporteIva().toFixed(2);
+        const importeNeto = venta.getImporteNeto().toFixed(2);
+        const importeTotal = venta.getImporteTotal().toFixed(2);
+        if(!this.validarImporteTotal(venta) || !this.validarFecha(fecha)) return console.error('Datos invalidos');
+        const tipoDeComprobante = venta.getTipoDeComprobante();
+
+
         var numero;
 
-        if(tipoDeComprobante == 1){
+        if(tipoDeComprobante == 'FacturaA'){
           numero = this.sesion.getNumeroComprobanteA();
-        }else numero = this.sesion.getNumeroComprobanteB();
-    
-        const tipoDocumento = this.getNumTipoDocumento();
-        const numDocumento = this.getNumDocumento(tipoDocumento);
+        }else{
+          numero = this.sesion.getNumeroComprobanteB();
+        }
+        const tipoDocumento = this.getTipoDocumento(cliente);
+        const numDocumento = this.getNumDocumento(tipoDocumento, cliente);
 
 
         const headers = {
-          'Content-Type' : 'text/xml;charset=UFT-8',
-          'SOAPAction': 'http://ISTP1.Service.Contracts.Service/LoginService/SolicitarCae'
+          'Content-Type' : 'text/xml;charset=UTF-8',
+          'SOAPAction': 'http://ISTP1.Service.Contracts.Service/ILoginService/SolicitarCae'
         }
 
         const xmlBody = 
           `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:istp="http://ISTP1.Service.Contracts.Service">
-        <soapenv:Header/>
-        <soapenv:Body>
-          <istp:SolicitarCae>
-            <token>${token}</token>
-            <fecha>${fecha}</fecha>
-            <ImporteIva>${importeIva}</ImporteIva>
-            <ImporteNeto>${importeNeto}</ImporteNeto>
-            <ImporteTotal>${importeTotal}</ImporteTotal>
-            <Numero>${numero}</Numero>
-            <NumeroDocumento>${numDocumento}</NumeroDocumento>
-            <TipoComprobante>${tipoDeComprobante}</TipoComprobante>
-            <TipoDocumento>${tipoDocumento}</TipoDocumento>
-          </istp:SolicitarCae>  
-        </soapenv:Body>
-      </soapenv:Envelope>`
+          <soapenv:Header/>
+          <soapenv:Body>
+             <istp:SolicitarCae>
+                <istp:token>${token}</istp:token>
+                <istp:solicitud xmlns:sge="http://schemas.datacontract.org/2004/07/SGE.Service.Contracts.Data">
+                      <sge:Fecha>${fecha}</sge:Fecha>
+                      <sge:ImporteIva>${importeIva}</sge:ImporteIva>
+                      <sge:ImporteNeto>${importeNeto}</sge:ImporteNeto>
+                      <sge:ImporteTotal>${importeTotal}</sge:ImporteTotal>
+                      <sge:Numero>${numero}</sge:Numero>
+                      <sge:NumeroDocumento>${numDocumento}</sge:NumeroDocumento>
+                      <sge:TipoComprobante>${tipoDeComprobante}</sge:TipoComprobante>
+                      <sge:TipoDocumento>${tipoDocumento}</sge:TipoDocumento>
+                </istp:solicitud> 
+             </istp:SolicitarCae>
+          </soapenv:Body>
+       </soapenv:Envelope>
+       
+       `
       
-      var attempts = 0;
       try{
         const response = await axios.post(this.url, xmlBody , {headers});
         return response.data
-        attempts = 2;
       }catch(error){
         console.error('error en la solicitud SOAP: ',error);
         throw error;
@@ -134,29 +130,29 @@ export class ConexionAfipService {
   }
     
 
-    private getNumTipoDocumento() : number{
-      const dni = this.venta.getCliente().getDni();
-      const cuil = this.venta.getCliente().getCuil();
-      const cuit = this.venta.getCliente().getCuit();
+    private getTipoDocumento(cliente : Cliente) : string{
+      const dni = cliente.getDni();
+      const cuil = cliente.getCuil();
+      const cuit = cliente.getCuit();
 
       if(dni && this.validarDni(dni)){
-        return 96;
+        return 'Dni';
       }else if(cuil && this.validarCui(cuit)){
-        return 86;
+        return 'Cuil';
       }else if(cuit && this.validarCui(cuit)){
-        return 80;
+        return 'Cuit';
       }
-      return 99;
+      return 'ConsumidorFinal';
     }
 
-    private getNumDocumento(tipoDocumento : number) : number{
+    private getNumDocumento(tipoDocumento : string, cliente : Cliente) : number{
       
-      if(tipoDocumento == 86){
-        return this.venta.getCliente().getCuil();
-      }else if(tipoDocumento == 80){
-        return this.venta.getCliente().getCuit();
-      }else if(tipoDocumento == 96){
-        return this.venta.getCliente().getDni();
+      if(tipoDocumento == 'Cuil'){
+        return cliente.getCuil();
+      }else if(tipoDocumento == 'Cuit'){
+        return cliente.getCuit();
+      }else if(tipoDocumento == 'Dni'){
+        return cliente.getDni();
       }
 
       return 0;
@@ -174,18 +170,34 @@ export class ConexionAfipService {
       else return false;
     }
 
-    private validarFecha(fecha : Date) : boolean{
-      const fechaActual = new Date();
+    private validarFecha(fecha : string) : boolean{
+      const fechaParseada = parse(fecha, "yyyy-MM-dd'T'HH:mm:ss.SS", new Date());
 
-      const diferenciaMilisegundos = Math.abs(fechaActual.getTime() - fecha.getTime());
-      const diferenciaDias = Math.ceil(diferenciaMilisegundos / (1000 * 60 * 60 * 24));
-    
-      return diferenciaDias <= 5;
+    const diferenciaEnDias = differenceInDays(new Date(), fechaParseada);
+
+    return Math.abs(diferenciaEnDias) <= 5;
 
     }
 
-    private validarImporteTotal() : boolean{
-      return this.venta.getImporteTotal() > 0;
+    private validarImporteTotal(venta : Venta) : boolean{
+      return venta.getImporteTotal() > 0;
+    }
+
+    public setToken(token : string){
+      this.sesion.setTokenAfip(token);
+    }
+
+    public incrementarNumComprobante(tipo : string){
+      if(tipo == 'FacturaA'){
+        this.sesion.setNumeroComprobanteA(+1);
+      }else this.sesion.setNumeroComprobanteB(+1);
+    }
+
+    setUltimosComprobantes(tipoDeComprobante : string){
+      if(tipoDeComprobante == 'FacturaA'){
+        this.sesion.setNumeroComprobanteA(this.sesion.getNumeroComprobanteA() + 1);
+      }else{
+        this.sesion.setNumeroComprobanteB(this.sesion.getNumeroComprobanteB() + 1);
+      }
     }
 }
-*/

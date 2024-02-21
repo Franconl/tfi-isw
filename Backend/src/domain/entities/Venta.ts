@@ -2,28 +2,31 @@ import { TipoDeComprobante } from "../entities/TipoDeComprobante";
 import { Usuario } from "../entities/Usuario";
 import { PuntoDeVenta } from "../entities/PuntoDeVenta";
 import { LineaDeVenta } from "../entities/LineaDeVenta";
-//import { Pago } from "../entities/Pago";
+import { Pago } from "../entities/Pago";
 import { Cliente } from "../entities/Cliente";
 import { v4 as uuid } from "uuid";
 import { Comprobante } from "./Comprobante";
+import { format } from 'date-fns';
 
 export class Venta {
   private id: string;
-  private fecha: Date;
+  private fecha: string;
   private monto!: number;
   private estado: string;
   private tipoDeComprobante!: TipoDeComprobante;
   private usuario: Usuario;
   private puntoDeVenta: PuntoDeVenta;
   private lineasDeVenta: LineaDeVenta[];
-  //private pago: Pago;
+  private pago!: Pago;
   private cliente: Cliente;
   private comprobante! : Comprobante;
 
   constructor(usuario: Usuario, cliente: Cliente, puntoDeVenta : PuntoDeVenta) {
     this.puntoDeVenta = puntoDeVenta;
     this.id = uuid();
-    this.fecha = new Date();
+    const fecha = new Date();
+    const fechaFormateada = format(fecha, "yyyy-MM-dd'T'HH:mm:ss.SS");
+    this.fecha = fechaFormateada;
     this.usuario = usuario;
     this.cliente = cliente;
     this.lineasDeVenta = [];
@@ -35,7 +38,7 @@ export class Venta {
     return this.id;
   }
 
-  getFecha() : Date {
+  getFecha() : string {
     return this.fecha;
   }
 
@@ -118,4 +121,25 @@ export class Venta {
   setComprobante(comprobante : Comprobante){
     this.comprobante = comprobante;
   }
+
+  setPago(pago : Pago){
+    this.pago = pago;
+  }
+
+  getPago(){
+    return this.pago;
+  }
+
+  getComprobante(){
+    return this.comprobante;
+  }
+
+  getPuntoDeVenta(){
+    return this.puntoDeVenta;
+  }
+
+  getUsuario(){
+    return this.usuario;
+  }
+
 }

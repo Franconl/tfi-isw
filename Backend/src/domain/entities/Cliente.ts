@@ -1,8 +1,7 @@
 import { CondicionTributaria } from "./CondicionTributaria";
-import { v4 as uuid } from "uuid";
 
 export class Cliente {
-  private id : string;
+  private id? : string;
   private nombre: string;
   private apellido: string;
   private telefono: string;
@@ -13,8 +12,8 @@ export class Cliente {
   private cuil? : number;
   private cuit? : number;
 
-  constructor(nombre: string, apellido: string, telefono: string, email: string, domicilio: string, options: { dni?: number; cuil?: number; cuit?: number }) {
-    this.id = uuid();
+  constructor( nombre: string, apellido: string, telefono: string, email: string, domicilio: string,condicion : CondicionTributaria, options: { dni?: number; cuil?: number; cuit?: number },id? : string,) {
+    this.id = id;
     this.nombre = nombre;
     this.apellido = apellido;
     this.telefono = telefono;
@@ -23,9 +22,12 @@ export class Cliente {
     this.dni = options.dni; 
     this.cuil = options.cuil;  
     this.cuit = options.cuit;
+    this.condicion = condicion;
   }
 
-  
+  getId(){
+    return this.id;
+  }
 
   // Getter para nombre
   getNombre(): string {
