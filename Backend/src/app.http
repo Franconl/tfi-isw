@@ -26,7 +26,7 @@ POST {{BASE_API}}/venta?dni=11111111
 
 ### Buscar Articulo e inventario diponible
 
-GET {{BASE_API}}/inventario?id=65c91913a2929dfba633b72b&sucursalId=65c923f5229d4ff6cd26c860
+GET {{BASE_API}}/inventario?id=65c91913a2929dfba633b72b
 
 ### Seleccionar Inventario
 POST {{BASE_API}}/venta/seleccionar?cantidad=1&id=65cd023b7f39c19ab573ccd3

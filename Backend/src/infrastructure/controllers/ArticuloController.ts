@@ -4,7 +4,7 @@ import { Articulo } from "../../domain/entities/Articulo";
 import { Categoria } from "../../domain/entities/Categoria";
 import { TipoDeTalle } from "../../domain/entities/TipoDeTalle";
 import { Marca } from "../../domain/entities/Marca";
-
+import { sesion } from "../routes/auth.routes";
 
 export class ArticuloController {
     private articuloService : ArticuloService;
@@ -75,8 +75,10 @@ export class ArticuloController {
     }
 
     public async buscarArticuloeInventario(req : Request , res : Response){
+
         const id = req.query.id as string;
-        const sucursalId = req.query.sucursalId as string;
+        const sucursalId = sesion.getSucursal().getId()
+        
         try{
             const response = await this.articuloService.buscarArticuloeInvantario(id,sucursalId);
             return response

@@ -6,6 +6,9 @@ import { Pago } from "../domain/entities/Pago";
 import { Comprobante } from "../domain/entities/Comprobante";
 import ComprobanteModel from "../infrastructure/models/comprobante.schema";
 import { LineaDeVenta } from "../domain/entities/LineaDeVenta";
+import { CondicionTributaria } from "../domain/entities/CondicionTributaria";
+import { TipoDeComprobante } from "../domain/entities/TipoDeComprobante";
+import { TipoDeComprobanteModel } from "../infrastructure/models/tipoComprobante.schema";
 
 export class VentaMongo implements IVentaRepository{
 
@@ -89,5 +92,31 @@ export class VentaMongo implements IVentaRepository{
             return false;
         }
     }
+
+    async obtenerTipoComprobante(emitidoPor : CondicionTributaria, recibidoPor : CondicionTributaria) {
+        try {
+
+            const tipoComprobanteMongo = await TipoDeComprobanteModel.findOne({ emitidoPor, recibidoPor }).exec();
+
+            console.log(tipoComprobanteMongo, emitidoPor, recibidoPor);
+
+            if (!tipoComprobanteMongo) {
+                console.error('No se encontró un Tipo de Comprobante para las condiciones especificadas.');
+                return null;
+            }
     
+            // Si alguna de las propiedades está faltante, se lanza un error
+            if (!tipoComprobanteMongo.emitidoPor || !tipoComprobanteMongo.recibidoPor || !tipoComprobanteMongo.descripcion) {
+                throw new Error('El Tipo de Comprobante recuperado tiene propiedades faltantes.');
+            }
+
+            const tipoComprobante = new TipoDeComprobante(tipoComprobanteMongo.descripcion, tipoComprobanteMongo.emitidoPor, tipoComprobanteMongo.recibidoPor);
+
+            return tipoComprobante;
+
+        } catch (error) {
+            console.error('Error al buscar Tipo de Comprobante:', error);
+            return null;
+        }
+    }
 }

@@ -29,6 +29,8 @@ router.post('/', async (req, res) => {
 
       await afipServiceController.solicitarToken();
       await afipServiceController.solicitarUltimoComprobante();
+      const condicionTienda = authController.obtenerCondicionTienda();
+      sesion.setCondicionTienda(condicionTienda);
     }
 
     res.status(200).send(sesion);

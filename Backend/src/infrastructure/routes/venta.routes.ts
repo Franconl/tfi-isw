@@ -26,9 +26,6 @@ var tarjetaController : TarjetaServiceController;
   router.post('/venta', async (req, res) => {
     try {
 
-      ventaService.setSesion(sesion);
-      
-
       const venta = await ventaCtrl.nuevaVenta(req, res);
 
 

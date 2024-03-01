@@ -1,3 +1,4 @@
+import { CondicionTributaria } from "../domain/entities/CondicionTributaria";
 import { Usuario } from "../domain/entities/Usuario";
 import { IUsuarioRepository } from "../domain/interfaces/IUsuarioRepository";
 import UsuarioModel from "../infrastructure/models/usuario.schema";
@@ -46,5 +47,10 @@ export class UsuarioMongo implements IUsuarioRepository {
             console.error('Error al eliminar el usuario:', error);
             return false; // Hubo un error
         }
+    }
+
+    obtenerCondicionTienda(): CondicionTributaria {
+        const condicionTienda = CondicionTributaria.RESPONSABLE_INSCRIPTO;
+        return condicionTienda;
     }
 }

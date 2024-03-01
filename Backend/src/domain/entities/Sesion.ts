@@ -1,3 +1,4 @@
+import { CondicionTributaria } from "./CondicionTributaria";
 import { PuntoDeVenta } from "./PuntoDeVenta";
 import { Sucursal } from "./Sucursal";
 import { Usuario } from "./Usuario";
@@ -12,6 +13,7 @@ export class Sesion{
         private numeroComprobanteA! : number;
         private numeroComprobanteB! : number;
         private tokenAfip! : string;
+        private condicionTienda! : CondicionTributaria;
 
       
         private constructor(usuario: Usuario, puntoDeVenta: PuntoDeVenta, sucursal : Sucursal) {
@@ -70,5 +72,13 @@ export class Sesion{
 
         getTokenAfip() : string {
           return this.tokenAfip;
+        }
+
+        setCondicionTienda(condicion : CondicionTributaria) : void {
+          this.condicionTienda = condicion;
+        }
+
+        getCondicionTienda() : CondicionTributaria {
+          return this.condicionTienda;
         }
 }

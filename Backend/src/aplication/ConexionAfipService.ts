@@ -83,7 +83,7 @@ export class ConexionAfipService {
 
         var numero;
 
-        if(tipoDeComprobante == 'FacturaA'){
+        if(tipoDeComprobante.getDescripcion() == 'FacturaA'){
           numero = this.sesion.getNumeroComprobanteA();
         }else{
           numero = this.sesion.getNumeroComprobanteB();

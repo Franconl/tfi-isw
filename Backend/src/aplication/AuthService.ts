@@ -1,3 +1,4 @@
+import { CondicionTributaria } from "../domain/entities/CondicionTributaria";
 import { PuntoDeVenta } from "../domain/entities/PuntoDeVenta";
 import { Sucursal } from "../domain/entities/Sucursal";
 import { Usuario } from "../domain/entities/Usuario";
@@ -72,5 +73,10 @@ export class AuthService{
         this.artRepo.setPdvOcupado(id);
 
     }     
+
+    public obtenerCondicionTienda() : CondicionTributaria{
+        const response = this.repositoryUsuario.obtenerCondicionTienda();
+        return response;
+    }
 
 }

@@ -2,39 +2,25 @@ import { Venta } from "../domain/entities/Venta";
 import { Cliente } from "../domain/entities/Cliente";
 import { CondicionTributaria } from "../domain/entities/CondicionTributaria";
 import { TipoDeComprobante } from "../domain/entities/TipoDeComprobante";
-import { Usuario } from "../domain/entities/Usuario";
 import { IClienteRepository } from "../domain/interfaces/IClienteRepository";
-import { Articulo } from "../domain/entities/Articulo";
 import { IArticuloRepository } from "../domain/interfaces/IArticuloReposiroty";
 import { Sesion } from "../domain/entities/Sesion";
-import { Inventario } from "../domain/entities/Inventario";
 import { LineaDeVenta } from "../domain/entities/LineaDeVenta";
-//import { ConexionAfipService } from "./ConexionAfipService";
-import { Sucursal } from "../domain/entities/Sucursal";
 import { IVentaRepository } from "../domain/interfaces/IVentaRepository";
 import { Comprobante } from "../domain/entities/Comprobante";
 import { Pago } from "../domain/entities/Pago";
+import { sesion } from "../infrastructure/routes/auth.routes";
 
 export class VentaService {
   private clienteRepository: IClienteRepository;
   private articuloRepository: IArticuloRepository;
   private ventaRepository : IVentaRepository;
-  private sesion : Sesion;
   private venta! : Venta | undefined;
 
   constructor(clienteRepository: IClienteRepository, articuloRepository : IArticuloRepository, sesion : Sesion, ventaRepo : IVentaRepository) {
     this.clienteRepository = clienteRepository;
     this.articuloRepository = articuloRepository;
     this.ventaRepository = ventaRepo;
-    this.sesion = sesion;
-  }
-
-  public setSesion(sesion : Sesion){
-    this.sesion = sesion;
-  }
-
-  public getSesion() : Sesion{
-    return this.sesion;
   }
 
   public getVenta(){
@@ -53,15 +39,20 @@ export class VentaService {
     try{
       const cliente = await this.clienteRepository.obtenerClientePorDni(dni);
       if(cliente){
-        const usuario = this.sesion.getUsuario();
-        const puntoDeVenta = this.sesion.getPuntoDeVenta();
+        const usuario = sesion.getUsuario()
+        const puntoDeVenta = sesion.getPuntoDeVenta();
 
         const nuevaVenta = new Venta(usuario, cliente,puntoDeVenta);
         this.venta = nuevaVenta;
 
         // Determinar el tipo de comprobante según la condición tributaria del cliente y la empresa
         const condicionTributariaEmpresa : CondicionTributaria = CondicionTributaria.RESPONSABLE_INSCRIPTO; 
-        const tipoDeComprobante = this.determinarTipoDeComprobante(cliente.getCondicionTributaria(), condicionTributariaEmpresa);
+        const tipoDeComprobante = await this.determinarTipoDeComprobante(cliente.getCondicionTributaria());
+
+        if(!tipoDeComprobante){
+          console.error('error al determinar tipo de comprobante')
+          return null;
+        }
 
         // Asignar el tipo de comprobante a la venta
         nuevaVenta.setTipoDeComprobante(tipoDeComprobante);
@@ -78,31 +69,21 @@ export class VentaService {
   }
 
   //Método para determinar el tipo de comprobante
-  private determinarTipoDeComprobante(condicionTributariaCliente: CondicionTributaria, condicionTributariaEmpresa: CondicionTributaria): TipoDeComprobante {
+  private async determinarTipoDeComprobante(condicionTributariaCliente: CondicionTributaria): Promise<TipoDeComprobante | null> {
 
-    var tipo : TipoDeComprobante = TipoDeComprobante.FACTURA_B;
-
-    if(condicionTributariaEmpresa == CondicionTributaria.RESPONSABLE_INSCRIPTO){
-
-      switch(condicionTributariaCliente){
-        case CondicionTributaria.CONSUMIDOR_FINAL:
-          tipo = TipoDeComprobante.FACTURA_B;
-          break;
-        case CondicionTributaria.MONOTRIBUTO:
-          tipo = TipoDeComprobante.FACTURA_A;
-          break;
-        case CondicionTributaria.EXENTO:
-          tipo = TipoDeComprobante.FACTURA_B;
-          break;
-        case CondicionTributaria.NO_RESPONSABLE:
-          tipo = TipoDeComprobante.FACTURA_B;
-          break;
-        case CondicionTributaria.RESPONSABLE_INSCRIPTO:
-          tipo = TipoDeComprobante.FACTURA_A;
-          break;
+    try{
+      const condicionTienda = sesion.getCondicionTienda();
+      const response : TipoDeComprobante = await this.ventaRepository.obtenerTipoComprobante(condicionTienda,condicionTributariaCliente);
+      if(!response){
+        console.error('error al obtener tipo de comprobante');
+        return null;
       }
-    } else {console.error('error al obtener la condicion tributaria de la tienda')}
-    return tipo;
+      return response;
+    }catch{
+      console.error('error al obtener tipo de comprobante');
+      return null;
+    }
+    
   }
   
   public async seleccionarInventario(id : string, cantidad : number) : Promise<LineaDeVenta[] | null>{
@@ -164,12 +145,16 @@ export class VentaService {
 
     public async setCliente(dni : number){
       try{
-        const cliente = await this.clienteRepository.obtenerClientePorDni(dni);
+        const cliente : Cliente = await this.clienteRepository.obtenerClientePorDni(dni);
 
         this.venta?.setCliente(cliente);
 
-        const condicionTributariaEmpresa : CondicionTributaria = CondicionTributaria.RESPONSABLE_INSCRIPTO; 
-        const tipoDeComprobante = this.determinarTipoDeComprobante(cliente.getCondicionTributaria(), condicionTributariaEmpresa);
+        const tipoDeComprobante = await this.determinarTipoDeComprobante(cliente.getCondicionTributaria());
+
+        if(!tipoDeComprobante){
+          console.error('error al determinar tipo de comprobante')
+          return null;
+        }
 
         // Asignar el tipo de comprobante a la venta
         this.venta?.setTipoDeComprobante(tipoDeComprobante);

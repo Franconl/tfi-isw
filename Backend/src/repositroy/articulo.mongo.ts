@@ -370,11 +370,11 @@ export class ArticuloMongo implements IArticuloRepository {
             try {
                 const sucursal = await SucursalModel.findById(criterios.id).exec();
                 console.log(sucursal)
-                if (!sucursal || !sucursal.nombre || !sucursal.ciudad || !sucursal.telefono) {
+                if (!sucursal || !sucursal._id || !sucursal.nombre || !sucursal.ciudad || !sucursal.telefono) {
                     return null
                 }
 
-                const sucursalResponse = new Sucursal(sucursal.nombre,sucursal.ciudad,sucursal.telefono)
+                const sucursalResponse = new Sucursal(sucursal._id.toString() ,sucursal.nombre,sucursal.ciudad,sucursal.telefono)
 
                 return sucursalResponse;
             } catch (error) {

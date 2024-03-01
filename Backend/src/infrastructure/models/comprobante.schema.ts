@@ -6,8 +6,7 @@ import { LineaDeVenta } from "../../domain/entities/LineaDeVenta";
 const ComprobanteSchema = new Schema(
     {
         tipoDeComprobante: {
-            type: String,
-            enum: Object.values(TipoDeComprobante),
+            type:  Schema.Types.ObjectId, ref: 'TipoDeComprobante',
             required: true
             },
         items :  [{

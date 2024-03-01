@@ -5,6 +5,7 @@ import { Sesion } from '../../domain/entities/Sesion';
 import { Usuario } from '../../domain/entities/Usuario';
 import { Sucursal } from '../../domain/entities/Sucursal';
 import { PuntoDeVenta } from '../../domain/entities/PuntoDeVenta';
+import { CondicionTributaria } from '../../domain/entities/CondicionTributaria';
 
 export class AuthController {
   private authService: AuthService;
@@ -56,6 +57,9 @@ export class AuthController {
 
   }
 
-
+  public obtenerCondicionTienda() : CondicionTributaria{
+    const response = this.authService.obtenerCondicionTienda();
+    return response;
+  }
   
 }
