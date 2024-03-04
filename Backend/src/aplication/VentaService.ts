@@ -17,7 +17,7 @@ export class VentaService {
   private ventaRepository : IVentaRepository;
   private venta! : Venta | undefined;
 
-  constructor(clienteRepository: IClienteRepository, articuloRepository : IArticuloRepository, sesion : Sesion, ventaRepo : IVentaRepository) {
+  constructor(clienteRepository: IClienteRepository, articuloRepository : IArticuloRepository, ventaRepo : IVentaRepository) {
     this.clienteRepository = clienteRepository;
     this.articuloRepository = articuloRepository;
     this.ventaRepository = ventaRepo;

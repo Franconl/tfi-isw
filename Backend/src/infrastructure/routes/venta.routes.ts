@@ -15,7 +15,7 @@ const router = express.Router();
 const ArticuloRepo = new ArticuloMongo();
 const ClienteRepo = new ClienteMongo();
 const ventaRepo = new VentaMongo();
-var ventaService : VentaService = new VentaService(ClienteRepo, ArticuloRepo, sesion, ventaRepo);
+var ventaService : VentaService = new VentaService(ClienteRepo, ArticuloRepo, ventaRepo);
 var ventaCtrl = new VentaServiceController(ventaService);
 var afipService;
 
