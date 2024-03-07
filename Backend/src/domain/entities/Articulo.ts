@@ -97,22 +97,21 @@ export class Articulo {
       this.marca = marca;
     }
     
-      obtenerMontoNeto(): number {
-        const montoNeto = this.costo + (this.costo * (this.margenDeGanancia / 100));
-        return montoNeto;
-      }
-    
-      obtenerMontoIVA(): number {
-        const montoNeto = this.obtenerMontoNeto();
-        const montoIVA = montoNeto * 0.21; 
-        return montoIVA;
-      }
-    
-      obtenerMontoTotal(): number {
-        const montoNeto = this.obtenerMontoNeto();
-        const montoIVA = this.obtenerMontoIVA();
-        const montoTotal = montoNeto + montoIVA;
-        return montoTotal;
-      }
+    obtenerMontoNeto(): number {
+      const montoNeto = this.costo + (this.costo * (this.margenDeGanancia / 100));
+      return parseFloat(montoNeto.toFixed(2));
     }
     
+    obtenerMontoIVA(): number {
+      const montoNeto = this.obtenerMontoNeto();
+      const montoIVA = montoNeto * 0.21; 
+      return parseFloat(montoIVA.toFixed(2));
+    }
+    
+    obtenerMontoTotal(): number {
+      const montoNeto = this.obtenerMontoNeto();
+      const montoIVA = this.obtenerMontoIVA();
+      const montoTotal = montoNeto + montoIVA;
+      return parseFloat(montoTotal.toFixed(2));
+    }
+  }
