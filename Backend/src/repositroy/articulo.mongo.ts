@@ -104,7 +104,7 @@ export class ArticuloMongo implements IArticuloRepository {
         try {
             const articulo = await ArticuloModel.findById(criterios.id).lean().exec();
             
-            if (!articulo) {
+            if (!articulo || articulo.estado == 'No diponible') {
                 return null; 
             }
             
@@ -169,7 +169,21 @@ export class ArticuloMongo implements IArticuloRepository {
         }
     }
     
-    
+    async eliminarArticulo(id : string) : Promise<any>{
+        try{
+            const articuloMongo = await ArticuloModel.findById(id);
+            if(!articuloMongo) return null;
+
+            articuloMongo.estado = 'No disponible';
+
+            const response = articuloMongo.save();
+
+            return response
+        }catch (error) {
+            console.error('Error al buscar el artículo:', error);
+            return null;
+        }
+    }
 
     async buscarInventario(criterios : { articulo : Articulo , sucursalId : string}) : Promise <any> {
         try {

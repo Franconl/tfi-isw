@@ -9,45 +9,46 @@ import { LineaDeVenta } from "../domain/entities/LineaDeVenta";
 import { IVentaRepository } from "../domain/interfaces/IVentaRepository";
 import { Comprobante } from "../domain/entities/Comprobante";
 import { Pago } from "../domain/entities/Pago";
-import { sesion } from "../infrastructure/routes/auth.routes";
+import { IUsuarioRepository } from "../domain/interfaces/IUsuarioRepository";
+import { ConexionAfipService } from "./ConexionAfipService";
+import { TarjetaData } from "../domain/entities/TarjetaData";
+import { ConexionTarjetaService } from "./ConexionSistTarjetaService";
 
 export class VentaService {
   private clienteRepository: IClienteRepository;
   private articuloRepository: IArticuloRepository;
   private ventaRepository : IVentaRepository;
-  private venta! : Venta | undefined;
+  private usuarioRepository : IUsuarioRepository;
 
-  constructor(clienteRepository: IClienteRepository, articuloRepository : IArticuloRepository, ventaRepo : IVentaRepository) {
+  constructor(usuarioRepo : IUsuarioRepository, clienteRepository: IClienteRepository, articuloRepository : IArticuloRepository, ventaRepo : IVentaRepository) {
     this.clienteRepository = clienteRepository;
     this.articuloRepository = articuloRepository;
     this.ventaRepository = ventaRepo;
+    this.usuarioRepository = usuarioRepo;
   }
 
-  public getVenta(){
-    if(this.venta){
-      return this.venta;
-    }
-    console.error('Venta no creada');
-  }
 
-  public resetVenta() : void{
-    this.venta = undefined;
-  }
-
-  public async crearNuevaVenta( dni : number): Promise<Venta | null>{
+  public async crearNuevaVenta( dni : number , sesionId : string): Promise<any>{
     // Crear una nueva venta
     try{
       const cliente = await this.clienteRepository.obtenerClientePorDni(dni);
-      if(cliente){
+      const sesion = await this.usuarioRepository.obtenerSesion(sesionId);
+
+      if(cliente && sesion){
+
+        const afip = new ConexionAfipService()
+
+        const token = await afip.solicitarToken(sesion);
+        await afip.solicitarUltimoComprobante(sesion);
+
         const usuario = sesion.getUsuario()
         const puntoDeVenta = sesion.getPuntoDeVenta();
 
         const nuevaVenta = new Venta(usuario, cliente,puntoDeVenta);
-        this.venta = nuevaVenta;
 
-        // Determinar el tipo de comprobante según la condición tributaria del cliente y la empresa
-        const condicionTributariaEmpresa : CondicionTributaria = CondicionTributaria.RESPONSABLE_INSCRIPTO; 
-        const tipoDeComprobante = await this.determinarTipoDeComprobante(cliente.getCondicionTributaria());
+        const condicionTienda = sesion.getCondicionTienda();
+        
+        const tipoDeComprobante = await this.determinarTipoDeComprobante(cliente.getCondicionTributaria(), condicionTienda);
 
         if(!tipoDeComprobante){
           console.error('error al determinar tipo de comprobante')
@@ -56,23 +57,25 @@ export class VentaService {
 
         // Asignar el tipo de comprobante a la venta
         nuevaVenta.setTipoDeComprobante(tipoDeComprobante);
+        nuevaVenta.setEstado('Pendiente');
 
-        return nuevaVenta;
+        const venta = await this.ventaRepository.insertNuevaVenta({ venta : nuevaVenta})
+        await this.usuarioRepository.guardarSesion(sesion);
+        return {venta, sesion} ;
       }else{
-        console.error('Cliente no encontrado');
+        console.error('Cliente o Sesion no encontrada');
         return null;
       }
     }catch(error){
-      console.error('error al buscar cliente');
+      console.error('error al buscar cliente y sesion');
       return null;
     }
   }
 
   //Método para determinar el tipo de comprobante
-  private async determinarTipoDeComprobante(condicionTributariaCliente: CondicionTributaria): Promise<TipoDeComprobante | null> {
+  private async determinarTipoDeComprobante(condicionTributariaCliente: CondicionTributaria,condicionTienda : CondicionTributaria): Promise<TipoDeComprobante | null> {
 
     try{
-      const condicionTienda = sesion.getCondicionTienda();
       const response : TipoDeComprobante = await this.ventaRepository.obtenerTipoComprobante(condicionTienda,condicionTributariaCliente);
       if(!response){
         console.error('error al obtener tipo de comprobante');
@@ -86,7 +89,7 @@ export class VentaService {
     
   }
   
-  public async seleccionarInventario(id : string, cantidad : number) : Promise<LineaDeVenta[] | null>{
+  public async seleccionarInventario(id : string, cantidad : number, ventaId : string) : Promise<LineaDeVenta[] | null>{
     try{
        
       const inventario = await this.articuloRepository.busarInventarioId({id});
@@ -94,23 +97,18 @@ export class VentaService {
       if(inventario && inventario.getCantidad() > 0){
 
 
-        if(this.venta){
-
           inventario.setCantidad(inventario.getCantidad() - cantidad);
 
           await this.articuloRepository.setInventarioCantidad(id,inventario.getCantidad());
 
           const precio = inventario.getArticulo().obtenerMontoTotal();
+
           const lineadeVenta = new LineaDeVenta(inventario, cantidad, precio);
 
-          this.venta.agregarLineaDeVenta(lineadeVenta);
+          const ldv = await this.ventaRepository.insertLineaDeVenta(lineadeVenta,ventaId);
 
-          return this.venta.getLineaDeVenta();
+          return ldv;
 
-        }else{
-          console.error('Venta no creada');
-          return null;
-        }
       }else{
         console.error('error: inventario invalido o sin stock');
         return null;
@@ -121,45 +119,71 @@ export class VentaService {
   }
 
   
-  public async finalizarVenta(){
-    if(this.venta){
-      const venta = this.venta
-      venta.setEstado("Aprobado");
-      const response = await this.ventaRepository.insertVenta({ venta });
-      this.resetVenta();
-      return response;
+  public async finalizarVenta(ventaId : string){
+      try{
+        const venta = await this.ventaRepository.insertVenta(ventaId);
+        return venta;
+      }catch(error){
+        throw error;
+      }
+    }
+  
+  public async finalizarSeleccion(ventaId : string, sesionId : string){
+    try{
+      const venta = await this.ventaRepository.obtenerVenta(ventaId);
+      const sesion = await this.usuarioRepository.obtenerSesion(sesionId);
+
+      if(!venta || !sesion){
+        console.error('venta o sesion no encontrada', ventaId , sesionId, venta ,sesion)
+        return null;
+      }
+      const afip = new ConexionAfipService();
+
+      const response = await afip.solicitarCae(venta, sesion);
+
+      const nuevaVenta = await this.crearComprobante(response.cae, venta);
+
+      return {response, nuevaVenta};
+
+    }catch(error){
+      console.error('error al solicitar cae y crear comprobante')
     }
   }
 
+  public async crearComprobante(cae : string, venta : Venta){
 
-  public crearComprobante(cae : string){
-      if(this.venta){
-        const comprobante = new Comprobante(this.venta.getTipoDeComprobante(),
-        this.venta.getLineaDeVenta(),this.venta.getCliente(), cae)
+    const ldv = venta.getLineaDeVenta();
+    const cliente = venta.getCliente();
+    const tipo = venta.getTipoDeComprobante()
 
-        this.venta.setComprobante(comprobante);
+    const comprobante = new Comprobante(tipo,ldv,cliente,cae);
+    venta.setComprobante(comprobante);
 
-        console.log('Comprobante creado');
-      }
-    }
+    await this.ventaRepository.insertComprobante(comprobante,venta.getId());
 
-    public async setCliente(dni : number){
+    return venta;
+  }
+
+    public async setCliente(sesionId : string, ventaId : string,dni : number){
       try{
+        
         const cliente : Cliente = await this.clienteRepository.obtenerClientePorDni(dni);
-
-        this.venta?.setCliente(cliente);
-
-        const tipoDeComprobante = await this.determinarTipoDeComprobante(cliente.getCondicionTributaria());
+        const sesion = await this.usuarioRepository.obtenerSesion(sesionId);
+        if(!sesion || !cliente){
+          console.error('error al buscar cliente y sesion para settear cliente')
+          return null
+        }
+        const tipoDeComprobante = await this.determinarTipoDeComprobante(cliente.getCondicionTributaria(),sesion?.getCondicionTienda());
 
         if(!tipoDeComprobante){
           console.error('error al determinar tipo de comprobante')
           return null;
         }
 
-        // Asignar el tipo de comprobante a la venta
-        this.venta?.setTipoDeComprobante(tipoDeComprobante);
+        await this.ventaRepository.setCliente(ventaId,cliente,tipoDeComprobante);
+        const ventaCliente = await this.ventaRepository.obtenerVenta(ventaId);
         console.log('Cliente asignado Correctamente');
-        return cliente;
+        return ventaCliente;
       }catch(error){
         console.error('error al buscar cliente');
         return null;
@@ -179,17 +203,61 @@ export class VentaService {
       }
     }
 
-    public setPago(tipo : string){
-      const cliente = this.venta?.getCliente();
-      const monto = this.venta?.getImporteTotal();
-      if(!cliente || !monto){
+    public async setPago(ventaId : string, tipo : string){
+      try{
+        const pago =  await this.ventaRepository.insertPago(ventaId,tipo)
+
+        return pago;
+      }catch(error){
+        console.error('error al crear pago');
         return null;
       }
-      const pago = new Pago(cliente,monto,tipo);
+    } 
 
-      this.venta?.setPago(pago);
+    public async solicitarTokenTarjeta(tarjetaData : TarjetaData , sesionId : string){
+      try{
+        const sistemaTarjeta = new ConexionTarjetaService();
 
-      return pago;
+        const token = await sistemaTarjeta.solicitarToken(tarjetaData);
+        const sesion = await this.usuarioRepository.obtenerSesion(sesionId);
+
+        if(!sesion || !token){
+          console.error('error al obtener sesion para alamcenar token');
+          return null;
+        }
+
+        sesion.setTokenTarjeta(token);
+
+        const sesionGuardada = await this.usuarioRepository.guardarSesion(sesion);
+
+        return sesionGuardada;
+
+      }catch(error){
+        console.error('error al solicitar token de pago con tarjeta');
+        return null;
+      }
+      
+      
+    }
+
+    public async confirmarPagoTarjeta(sesionId : string, ventaId : string){
+      
+      try{
+        const venta = await this.ventaRepository.obtenerVenta(ventaId);
+        const sesion = await this.usuarioRepository.obtenerSesion(sesionId);
+
+        if(!venta || !sesion){
+          console.error('error al buscar venta y sesion para confirmar pago con tarjeta',ventaId, venta)
+          return null;
+        }
+
+        const sistemaTarjeta = new ConexionTarjetaService()
+        const response = await sistemaTarjeta.confirmarPago(sesion.getTokenTarjeta(),venta.getMonto(),venta.getId())
+
+        return response;
+      }catch(error){
+        console.error('error al confirmar pago con tarjeta');
+      }
     }
     
 }

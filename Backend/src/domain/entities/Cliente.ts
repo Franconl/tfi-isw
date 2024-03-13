@@ -98,7 +98,7 @@ export class Cliente {
   }
 
   setCuit(cuit : number) : void {
-    this.cuil = cuit;
+    this.cuit = cuit;
   }
 
   getCuit() : any {

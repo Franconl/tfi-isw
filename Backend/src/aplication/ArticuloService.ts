@@ -132,4 +132,14 @@ export class ArticuloService{
             throw error;
         }
     }
+
+    async eliminarArticulo(id : string){
+        try{
+            const response = await this.articuloRepository.eliminarArticulo(id);
+            return response;
+        }catch (error) {
+            console.error('Error al buscar marca:', error);
+            throw error;
+        }
+    }
 }

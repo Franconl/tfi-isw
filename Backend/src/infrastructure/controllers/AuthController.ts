@@ -16,28 +16,18 @@ export class AuthController {
 
   public async iniciarSesion(req: Request, res: Response): Promise<Sesion | null> {
     try {
-        const { user, pass, sucursal, puntoDeVenta } = req.body;
+        const { user, pass, puntoDeVenta } = req.body;
 
         // Verificar si los datos necesarios están presentes en el cuerpo de la solicitud
-        if (!user || !pass || !sucursal || !puntoDeVenta) {
+        if (!user || !pass  || !puntoDeVenta) {
             res.status(400).json({ mensaje: 'Faltan datos en el cuerpo de la solicitud' });
             return null;
         }
-
-        // Obtener la información del usuario, sucursal y punto de venta
-        const usuario = await this.authService.authUser(user, pass);
-        const infoSucursal = await this.authService.getSucursal(sucursal);
-        const infoPuntoDeVenta = await this.authService.getPuntoDeVenta(puntoDeVenta);
-
-        // Verificar si se encontraron los datos necesarios y el punto de venta está disponible
-        if (usuario && infoSucursal && infoPuntoDeVenta && infoPuntoDeVenta.getEstado() === "disponible") {
-            // Crear y retornar la sesión
-            const sesion = this.crearSesion(usuario, infoSucursal, infoPuntoDeVenta);
+            const sesion = this.authService.crearSesion(user,pass, puntoDeVenta);
             
-           
-            this.authService.setPuntoDeVentaOcupado(infoPuntoDeVenta);
-            return sesion;
-        } else {
+            if(sesion){
+              return sesion;
+            }else {
             // Devolver un error si los datos son inválidos o el punto de venta no está disponible
             res.status(401).json({ mensaje: 'Credenciales o sucursal inválidas o punto de venta no disponible' });
             return null;
@@ -49,15 +39,21 @@ export class AuthController {
     }
 }
 
-
-  // Método para crear la sesión (ajusta según tu implementación real)
-  private crearSesion(usuario: Usuario, sucursal: Sucursal, puntoDeVenta : PuntoDeVenta) {
-
-    return Sesion.obtenerInstancia(usuario, puntoDeVenta ,sucursal);
-
+  public async cerrarSesion(req: Request, res: Response){
+    try{
+      const sesionId = req.body.sesion as string;
+      const response = this.authService.cerrarSesion(sesionId);
+      return response;
+    }catch (error) {
+        console.error('Error al cerrar iniciar sesión:', error);
+        res.status(500).json({ mensaje: 'Error interno del servidor' });
+        return null;
+    }
   }
 
-  public obtenerCondicionTienda() : CondicionTributaria{
+
+  public  obtenerCondicionTienda() : CondicionTributaria{
+
     const response = this.authService.obtenerCondicionTienda();
     return response;
   }

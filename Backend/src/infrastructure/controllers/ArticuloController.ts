@@ -4,7 +4,6 @@ import { Articulo } from "../../domain/entities/Articulo";
 import { Categoria } from "../../domain/entities/Categoria";
 import { TipoDeTalle } from "../../domain/entities/TipoDeTalle";
 import { Marca } from "../../domain/entities/Marca";
-import { sesion } from "../routes/auth.routes";
 
 export class ArticuloController {
     private articuloService : ArticuloService;
@@ -62,6 +61,18 @@ export class ArticuloController {
         }
     }
 
+    public async eliminarArticulo(req : Request , res : Response){
+        try{
+            const id = req.query.id as string;
+            const response = await this.articuloService.eliminarArticulo(id);
+            return response;
+        }catch (error) {
+            console.error('Error al seleccionar el artículo:', error);
+            res.status(500).json({ mensaje: 'Error interno del servidor' });
+            return null;
+        }
+    }
+
     public async buscarArticulo(req : Request , res : Response){
         const id = req.query.id as string;
         try{
@@ -77,7 +88,7 @@ export class ArticuloController {
     public async buscarArticuloeInventario(req : Request , res : Response){
 
         const id = req.query.id as string;
-        const sucursalId = sesion.getSucursal().getId()
+        const sucursalId = "65c923f5229d4ff6cd26c860"
         
         try{
             const response = await this.articuloService.buscarArticuloeInvantario(id,sucursalId);

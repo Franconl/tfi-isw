@@ -6,34 +6,37 @@ import { Usuario } from "./Usuario";
 
 export class Sesion{
 
-        private static instancia: Sesion | null = null;
+        private id! : string;
         private usuario: Usuario;
         private puntoDeVenta: PuntoDeVenta;
-        private sucursal : Sucursal;
         private numeroComprobanteA! : number;
         private numeroComprobanteB! : number;
         private tokenAfip! : string;
         private condicionTienda! : CondicionTributaria;
+        private tokenTarjeta! : string
 
       
-        private constructor(usuario: Usuario, puntoDeVenta: PuntoDeVenta, sucursal : Sucursal) {
+        constructor(usuario: Usuario, puntoDeVenta: PuntoDeVenta) {
           this.usuario = usuario;
           this.puntoDeVenta = puntoDeVenta;
-          this.sucursal = sucursal;
-        }
-      
-        static obtenerInstancia(usuario: Usuario, puntoDeVenta: PuntoDeVenta, sucursal : Sucursal): Sesion {
-          if (!Sesion.instancia) {
-            Sesion.instancia = new Sesion(usuario, puntoDeVenta, sucursal);
-            puntoDeVenta.setEstado("ocupado");
-          }
-          return Sesion.instancia;
         }
 
-        getSucursal() : Sucursal{
-          return this.sucursal;
+        getTokenTarjeta(){
+          return this.tokenTarjeta
         }
-      
+
+        setTokenTarjeta(token : string){
+          this.tokenTarjeta = token
+        }
+
+        getId(){
+          return this.id;
+        }
+
+        setId(id : string){
+          this.id = id;
+        }
+
         getUsuario(): Usuario {
           return this.usuario;
         }

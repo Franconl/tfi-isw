@@ -1,12 +1,13 @@
 
 export class Usuario {
-    private id? : string; 
+    private id : string; 
     private username: string;
     private password: string;
     private permisos : string;
 
   
-    constructor(username: string, password: string, permisos : string, id? : string) {
+    constructor(id : string, username: string, password: string, permisos : string) {
+      this.id = id;
       this.username = username;
       this.password = password;
       this.permisos = permisos;

@@ -4,18 +4,6 @@ import { Venta } from "../domain/entities/Venta";
 import { VentaService } from "./VentaService";
 
 export class ConexionTarjetaService {
-  private venta! : Venta;
-
-  constructor(ventaService: VentaService) {
-
-    const venta = ventaService.getVenta();
-
-    if (venta instanceof Venta) {
-      this.venta = venta;
-    } else {
-      console.error('La venta obtenida no es una instancia de Venta');
-    }
-  }
 
   public async solicitarToken(tarjetaData: TarjetaData): Promise<any> {
     try {
@@ -43,7 +31,7 @@ export class ConexionTarjetaService {
     }
   }
 
-  public async confirmarPago(token: string, monto: number): Promise<any> {
+  public async confirmarPago(token: string, monto: number, ventaId : string): Promise<any> {
     try {
       const requestOptions = {
         method: 'POST',
@@ -53,7 +41,7 @@ export class ConexionTarjetaService {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          "site_transaction_id" : this.venta.getId(),
+          "site_transaction_id" : ventaId,
           "payment_method_id" : 1,
           "token" : token,
           "bin" : "450799",

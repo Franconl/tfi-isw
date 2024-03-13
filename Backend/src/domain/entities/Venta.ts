@@ -9,7 +9,7 @@ import { Comprobante } from "./Comprobante";
 import { format } from 'date-fns';
 
 export class Venta {
-  private id: string;
+  private id!: string;
   private fecha: string;
   private monto!: number;
   private estado: string;
@@ -21,9 +21,8 @@ export class Venta {
   private cliente: Cliente;
   private comprobante! : Comprobante;
 
-  constructor(usuario: Usuario, cliente: Cliente, puntoDeVenta : PuntoDeVenta) {
+  constructor(usuario: Usuario, cliente: Cliente, puntoDeVenta : PuntoDeVenta, id? : string) {
     this.puntoDeVenta = puntoDeVenta;
-    this.id = uuid();
     const fecha = new Date();
     const fechaFormateada = format(fecha, "yyyy-MM-dd'T'HH:mm:ss.SS");
     this.fecha = fechaFormateada;
@@ -31,7 +30,12 @@ export class Venta {
     this.cliente = cliente;
     this.lineasDeVenta = [];
     this.estado = "Pendiente";
+    if(id)
+    this.id = id; 
+  }
 
+  setFecha(fecha : string){
+    this.fecha = format(fecha, "yyyy-MM-dd'T'HH:mm:ss.SS");
   }
 
   getId() : string{
@@ -95,28 +99,14 @@ export class Venta {
 
 
   getImporteIva() : number {
-    let sum = 0;
-    this.lineasDeVenta.forEach(lineaDeVenta => {
-      sum =+ (lineaDeVenta.getInventario().getArticulo().obtenerMontoIVA()) * lineaDeVenta.getCantidad();
-    });
-
-    return sum;
+    return (this.getMonto() - this.getImporteNeto())
   }
 
   getImporteNeto() : number{
-    let sum = 0;
-    this.lineasDeVenta.forEach(lineaDeVenta => {
-      sum =+ (lineaDeVenta.getInventario().getArticulo().obtenerMontoNeto()) * lineaDeVenta.getCantidad();
-    });
+    return this.getMonto() / 1.21
 
-    return sum;
   }
 
-  getImporteTotal() : number {
-    let sum = this.getImporteIva() + this.getImporteNeto();
-
-    return sum;
-  }
 
   setComprobante(comprobante : Comprobante){
     this.comprobante = comprobante;
@@ -140,6 +130,10 @@ export class Venta {
 
   getUsuario(){
     return this.usuario;
+  }
+
+  setLineaDeVenta(ldv : LineaDeVenta[]){
+    this.lineasDeVenta = ldv;
   }
 
 }

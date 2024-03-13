@@ -32,4 +32,5 @@ export interface IArticuloRepository {
     setPdvOcupado(id : string) : void
     setInventarioCantidad(id : string,cantidad : number) : Promise<void>
     modificarArticulo(articulo : Articulo) : Promise<any>
+    eliminarArticulo(id : string) : Promise<any>
 }

@@ -11,7 +11,8 @@ interface VentaDocument {
     id: string;
     fecha: string;
     monto: number;
-    tipoDeComprobante: TipoDeComprobante;
+    estado : String;
+    tipoDeComprobante: Types.ObjectId;
     usuario: Types.ObjectId;
     puntoDeVenta: Types.ObjectId;
     lineasDeVenta: LineaDeVenta[]; // Array de objetos de tipo LineaDeVenta
@@ -24,11 +25,8 @@ const VentaSchema = new Schema<VentaDocument>({
     id: String,
     fecha: String,
     monto: Number,
-    tipoDeComprobante: {
-        type: String,
-        enum: Object.values(TipoDeComprobante),
-        required: true
-    },
+    estado : String,
+    tipoDeComprobante: { type: Schema.Types.ObjectId, ref: 'TipoComprobante' },
     usuario: { type: Schema.Types.ObjectId, ref: 'Usuario' },
     puntoDeVenta: { type: Schema.Types.ObjectId, ref: 'PuntoDeVenta' },
     lineasDeVenta: [{

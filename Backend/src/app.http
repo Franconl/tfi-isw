@@ -13,7 +13,6 @@ Content-Type: application/json
 {
     "user" : "Franco",
     "pass" : "Franco",
-    "sucursal" : "65c923f5229d4ff6cd26c860",
     "puntoDeVenta" : "65cb8d06d9fcb1fb2fb0a1ed"
 }
 
@@ -22,6 +21,11 @@ Content-Type: application/json
 ### Crear Venta
 
 POST {{BASE_API}}/venta?dni=11111111
+Content-Type: application/json
+
+{
+    "sesionId" : "65f1bf47da8d6202882ca1c9"
+}
 
 
 ### Buscar Articulo e inventario diponible
@@ -30,16 +34,31 @@ GET {{BASE_API}}/inventario?id=65c91913a2929dfba633b72b
 
 ### Seleccionar Inventario
 POST {{BASE_API}}/venta/seleccionar?cantidad=1&id=65cd023b7f39c19ab573ccd3
+Content-Type: application/json
+
+{
+    "sesion" : "65f1bf47da8d6202882ca1c9",
+    "venta" : "65f1bfe5da8d6202882ca1e7"
+}
 
 ### finalizar seleccion articulos
 POST {{BASE_API}}/venta/cae
+Content-Type: application/json
+
+{
+    "sesion" : "65f1bf47da8d6202882ca1c9",
+    "venta" : "65f1bfe5da8d6202882ca1e7"
+}
+
 
 ### indicar tipó de pago
 POST {{BASE_API}}/venta/pago
 Content-Type: application/json
 
 {
-    "tipo" : "efectivo"
+    "tipo" : "efectivo",
+    "sesion" : "65f1bf47da8d6202882ca1c9",
+    "venta" : "65f1bfe5da8d6202882ca1e7"
 }
 
 ### Solicitar Token Tarjeta
@@ -48,22 +67,37 @@ POST {{BASE_API}}/venta/tarjeta
 Content-Type: application/json
 
 {
-"card_number": "4507990000004905",
-"card_expiration_month": "08",
-"card_expiration_year": "24",
-"security_code": "123",
-"card_holder_name": "John Doe",
-"card_holder_identification": {
-"type": "dni",
-"number": "25123456"
-}
+
+    "tarjeta" : {   "card_number": "4507990000004905",
+        "card_expiration_month": "08",
+        "card_expiration_year": "24",
+        "security_code": "123",
+        "card_holder_name": "John Doe",
+        "card_holder_identification": {
+        "type": "dni",
+        "number": "25123456"
+        }},
+
+    "sesion" : "65ef7aa1375611b026bb60b8"
 }
 
 ### Confirmar pago tarjeta
-POST {{BASE_API}}/venta/tarjeta/confirmar?monto=2000
+POST {{BASE_API}}/venta/tarjeta/confirmar
+Content-Type: application/json
+
+{
+    "sesion" : "65ef7aa1375611b026bb60b8",
+    "venta" : "65ef7aab375611b026bb60c0"
+}
 
 ### finalizarVenta
 POST {{BASE_API}}/venta/finalizar
+Content-Type: application/json
+
+{
+    "sesion" : "65f1bf47da8d6202882ca1c9",
+    "venta" : "65f1bfe5da8d6202882ca1e7"
+}
 
 ### Crear Articulo
 PUT {{BASE_API}}/articulo
@@ -108,7 +142,14 @@ Content-Type: application/json
 GET {{BASE_API}}/articulo?id=65c91913a2929dfba633b72b
 
 ### ASIGNAR CLIENTE
-POST {{BASE_API}}/venta/cliente?dni=12345678
+POST {{BASE_API}}/venta/cliente?dni=87654321
+Content-Type: application/json
+
+{
+    "sesion" : "65f1bf47da8d6202882ca1c9",
+    "venta" : "65f1bfe5da8d6202882ca1e7"
+}
+
 
 ### CREAR CLIENTE
 PUT {{BASE_API}}/cliente

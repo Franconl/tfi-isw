@@ -1,24 +1,17 @@
 import axios from "axios";
 import { Venta } from "../domain/entities/Venta";
 import { TipoDeComprobante } from "../domain/entities/TipoDeComprobante";
-import { Sesion } from "../domain/entities/Sesion";
 import { VentaService } from "./VentaService";
 import { parse, differenceInDays } from 'date-fns';
 import { Cliente } from "../domain/entities/Cliente";
+import { parseString } from "xml2js";
+import { promisify } from 'util';
+import { Sesion } from "../domain/entities/Sesion";
 
 export class ConexionAfipService {
-    private sesion : Sesion;
     private url : string = "http://istp1service.azurewebsites.net/LoginService.svc";
 
-    constructor(sesion : Sesion){
-        this.sesion = sesion;
-    }
-
-    getSesion() : Sesion {
-      return this.sesion;
-    }
-    
-    public async solicitarToken() : Promise<any> {
+    public async solicitarToken(sesion : Sesion) : Promise<any> {
         const headers = {
             'Content-Type': 'text/xml;charset=UTF-8',
             'SOAPAction': 'http://ISTP1.Service.Contracts.Service/ILoginService/SolicitarAutorizacion',
@@ -35,7 +28,19 @@ export class ConexionAfipService {
 
             try{
                 const response = await axios.post(this.url,xmlBody,{ headers })
-                return response.data;
+                const parseStringAsync = promisify(parseString);
+                const data: any = await parseStringAsync(response.data);
+
+                const result = data['s:Envelope']['s:Body'][0]['SolicitarAutorizacionResponse'][0]['SolicitarAutorizacionResult'][0];
+    
+                const token = result['a:Token'][0];
+                
+                if(token){
+                    this.setToken(token , sesion);
+                    console.log('token solicitado');
+                    return token;
+                }throw Error;
+
             }catch(error){
                 console.error('error en la solicitud SOAP: ',error);
                 throw error;
@@ -43,8 +48,8 @@ export class ConexionAfipService {
 
         }
     
-    public async solicitarUltimoComprobante() : Promise<any> {
-      const token = this.sesion.getTokenAfip();
+    public async solicitarUltimoComprobante(sesion : Sesion) : Promise<any> {
+      const token = sesion.getTokenAfip();
         const headers = {
             'Content-Type' : 'text/xml;charset=UTF-8',
             'SOAPAction': 'http://ISTP1.Service.Contracts.Service/ILoginService/SolicitarUltimosComprobantes'
@@ -61,7 +66,28 @@ export class ConexionAfipService {
 
       try{
         const response = await axios.post(this.url, xmlBody , {headers});
-        return response.data
+
+            const parseStringAsync = promisify(parseString);
+            const data: any = await parseStringAsync(response.data);
+    
+            // Acceder a los datos según la estructura del objeto JSON devuelto
+            const comprobantes = data['s:Envelope']['s:Body'][0]['SolicitarUltimosComprobantesResponse'][0]['SolicitarUltimosComprobantesResult'][0]['a:Comprobantes'][0]['a:Comprobante'];
+    
+            for (const comprobante of comprobantes) {
+                const descripcion = comprobante['a:Descripcion'][0];
+                const numero = comprobante['a:Numero'][0];
+                
+                if(numero){
+                    if (descripcion === 'Factura A') {
+                        sesion.setNumeroComprobanteA(parseInt(numero) + 1);
+                    } else if (descripcion === 'Factura B') {
+                        sesion.setNumeroComprobanteB(parseInt(numero) + 1);
+                    }
+
+                    console.log('Ultimos comprobantes solicitados')
+                }
+                
+            }
       }catch(error){
         console.error('error en la solicitud SOAP: ',error);
         throw error;
@@ -69,14 +95,14 @@ export class ConexionAfipService {
 
     }
 
-    public async solicitarCae(venta : Venta) : Promise<any> {
+    public async solicitarCae(venta : Venta , sesion : Sesion) : Promise<any> {
         const cliente = venta.getCliente();
 
-        const token = this.sesion.getTokenAfip();
+        const token = sesion.getTokenAfip();
         const fecha = venta.getFecha();
         const importeIva = venta.getImporteIva().toFixed(2);
         const importeNeto = venta.getImporteNeto().toFixed(2);
-        const importeTotal = venta.getImporteTotal().toFixed(2);
+        const importeTotal = venta.getMonto().toFixed(2);
         if(!this.validarImporteTotal(venta) || !this.validarFecha(fecha)) return console.error('Datos invalidos');
         const tipoDeComprobante = venta.getTipoDeComprobante();
 
@@ -84,11 +110,11 @@ export class ConexionAfipService {
         var numero;
 
         if(tipoDeComprobante.getDescripcion() == 'FacturaA'){
-          numero = this.sesion.getNumeroComprobanteA();
+          numero = sesion.getNumeroComprobanteA();
         }else{
-          numero = this.sesion.getNumeroComprobanteB();
+          numero = sesion.getNumeroComprobanteB();
         }
-        const tipoDocumento = this.getTipoDocumento(cliente);
+        const tipoDocumento = this.getTipoDocumento(cliente , tipoDeComprobante);
         const numDocumento = this.getNumDocumento(tipoDocumento, cliente);
 
 
@@ -110,7 +136,7 @@ export class ConexionAfipService {
                       <sge:ImporteTotal>${importeTotal}</sge:ImporteTotal>
                       <sge:Numero>${numero}</sge:Numero>
                       <sge:NumeroDocumento>${numDocumento}</sge:NumeroDocumento>
-                      <sge:TipoComprobante>${tipoDeComprobante}</sge:TipoComprobante>
+                      <sge:TipoComprobante>${tipoDeComprobante.getDescripcion()}</sge:TipoComprobante>
                       <sge:TipoDocumento>${tipoDocumento}</sge:TipoDocumento>
                 </istp:solicitud> 
              </istp:SolicitarCae>
@@ -120,8 +146,23 @@ export class ConexionAfipService {
        `
       
       try{
+        console.log(xmlBody)
         const response = await axios.post(this.url, xmlBody , {headers});
-        return response.data
+
+          const parseStringAsync = promisify(parseString);
+          const data: any = await parseStringAsync(response.data);
+
+          const cae = data['s:Envelope']['s:Body'][0]['SolicitarCaeResponse'][0]['SolicitarCaeResult'][0]['a:Cae'][0];
+          const error = data['s:Envelope']['s:Body'][0]['SolicitarCaeResponse'][0]['SolicitarCaeResult'][0]['a:Error'][0];
+          const estado = data['s:Envelope']['s:Body'][0]['SolicitarCaeResponse'][0]['SolicitarCaeResult'][0]['a:Estado'][0];
+          const fechaDeVencimiento = data['s:Envelope']['s:Body'][0]['SolicitarCaeResponse'][0]['SolicitarCaeResult'][0]['a:FechaDeVencimiento'][0];
+          const observacion = data['s:Envelope']['s:Body'][0]['SolicitarCaeResponse'][0]['SolicitarCaeResult'][0]['a:Observacion'][0];
+          const tipoComprobante = data['s:Envelope']['s:Body'][0]['SolicitarCaeResponse'][0]['SolicitarCaeResult'][0]['a:TipoComprobante'][0];
+          if(estado == 'Aprobada' || estado == 'AprobadaParcialmente'){
+              console.log('Venta Aprobada por AFIP');
+              this.setUltimosComprobantes(tipoComprobante, sesion);
+          }
+          return {cae,error,estado,tipoComprobante}
       }catch(error){
         console.error('error en la solicitud SOAP: ',error);
         throw error;
@@ -130,19 +171,24 @@ export class ConexionAfipService {
   }
     
 
-    private getTipoDocumento(cliente : Cliente) : string{
+    private getTipoDocumento(cliente : Cliente, tipoDeComprobante : TipoDeComprobante) : string{
       const dni = cliente.getDni();
+      if(dni == 11111111){
+        return 'ConsumidorFinal'
+      }
       const cuil = cliente.getCuil();
       const cuit = cliente.getCuit();
 
-      if(dni && this.validarDni(dni)){
-        return 'Dni';
-      }else if(cuil && this.validarCui(cuit)){
-        return 'Cuil';
-      }else if(cuit && this.validarCui(cuit)){
-        return 'Cuit';
+      console.log(dni,cuil,cuit)
+
+      if(tipoDeComprobante.getDescripcion() == "FacturaB"){
+        if(dni && this.validarDni(dni)) return 'Dni';
+      }else{
+        if(cuit && this.validarCui(cuit)) return 'Cuit';
+        if(cuil && this.validarCui(cuil)) return 'Cuil';
       }
-      return 'ConsumidorFinal';
+
+      return 'ConsumidorFinal'
     }
 
     private getNumDocumento(tipoDocumento : string, cliente : Cliente) : number{
@@ -180,24 +226,24 @@ export class ConexionAfipService {
     }
 
     private validarImporteTotal(venta : Venta) : boolean{
-      return venta.getImporteTotal() > 0;
+      return venta.getMonto() > 0;
     }
 
-    public setToken(token : string){
-      this.sesion.setTokenAfip(token);
+    public setToken(token : string, sesion : Sesion){
+      sesion.setTokenAfip(token);
     }
 
-    public incrementarNumComprobante(tipo : string){
+    public incrementarNumComprobante(tipo : string, sesion : Sesion){
       if(tipo == 'FacturaA'){
-        this.sesion.setNumeroComprobanteA(+1);
-      }else this.sesion.setNumeroComprobanteB(+1);
+        sesion.setNumeroComprobanteA(+1);
+      }else sesion.setNumeroComprobanteB(+1);
     }
 
-    setUltimosComprobantes(tipoDeComprobante : string){
+    setUltimosComprobantes(tipoDeComprobante : string, sesion : Sesion){
       if(tipoDeComprobante == 'FacturaA'){
-        this.sesion.setNumeroComprobanteA(this.sesion.getNumeroComprobanteA() + 1);
+        sesion.setNumeroComprobanteA(sesion.getNumeroComprobanteA() + 1);
       }else{
-        this.sesion.setNumeroComprobanteB(this.sesion.getNumeroComprobanteB() + 1);
+        sesion.setNumeroComprobanteB(sesion.getNumeroComprobanteB() + 1);
       }
     }
 }

@@ -13,6 +13,10 @@ export class PuntoDeVenta {
       this.sucursal = sucursal;
     }
   
+    getSucursal(){
+      return this.sucursal;
+    }
+
     // Getter para número
     getNumero(): number {
       return this.numero;

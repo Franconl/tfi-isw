@@ -5,11 +5,13 @@ import { ArticuloController } from "../controllers/ArticuloController";
 
 const router = express.Router();
 
-const articuloRepo = new ArticuloMongo();
-const articuloService = new ArticuloService(articuloRepo);
-const articuloCtrl = new ArticuloController(articuloService);
+
 
 router.put('/articulo',async (req,res) =>{
+  const articuloRepo = new ArticuloMongo();
+  const articuloService = new ArticuloService(articuloRepo);
+  const articuloCtrl = new ArticuloController(articuloService);
+
     try{
         const response = await articuloCtrl.crearArticulo(req,res);
         res.status(200).send(response);
@@ -19,6 +21,9 @@ router.put('/articulo',async (req,res) =>{
 })
 
 router.put('/categoria',async (req,res) =>{
+  const articuloRepo = new ArticuloMongo();
+  const articuloService = new ArticuloService(articuloRepo);
+  const articuloCtrl = new ArticuloController(articuloService);
   try{
       const response = await articuloCtrl.crearCategoria(req,res);
       res.status(200).send(response);
@@ -28,6 +33,9 @@ router.put('/categoria',async (req,res) =>{
 })
 
 router.put('/marca',async (req,res) =>{
+  const articuloRepo = new ArticuloMongo();
+  const articuloService = new ArticuloService(articuloRepo);
+  const articuloCtrl = new ArticuloController(articuloService);
   try{
       const response = await articuloCtrl.CrearMarca(req,res);
       res.status(200).send(response);
@@ -37,6 +45,9 @@ router.put('/marca',async (req,res) =>{
 })
 
 router.put('/tipodetalle',async (req,res) =>{
+  const articuloRepo = new ArticuloMongo();
+  const articuloService = new ArticuloService(articuloRepo);
+  const articuloCtrl = new ArticuloController(articuloService);
   try{
       const response = await articuloCtrl.crearTipoDeTalle(req,res);
       res.status(200).send(response);
@@ -46,6 +57,9 @@ router.put('/tipodetalle',async (req,res) =>{
 })
 
 router.get('/articulo', async (req,res) => {
+  const articuloRepo = new ArticuloMongo();
+  const articuloService = new ArticuloService(articuloRepo);
+  const articuloCtrl = new ArticuloController(articuloService);
   try{
     const response = await articuloCtrl.buscarArticulo(req,res);
     res.status(200).send(response);
@@ -55,6 +69,9 @@ router.get('/articulo', async (req,res) => {
 })
 
 router.get('/inventario', async (req, res) => {
+  const articuloRepo = new ArticuloMongo();
+  const articuloService = new ArticuloService(articuloRepo);
+  const articuloCtrl = new ArticuloController(articuloService);
   try{
     const response = await articuloCtrl.buscarArticuloeInventario(req,res);
     res.status(200).send(response);
@@ -64,6 +81,9 @@ router.get('/inventario', async (req, res) => {
 });
 
 router.get('/marcas', async (req, res) => {
+  const articuloRepo = new ArticuloMongo();
+  const articuloService = new ArticuloService(articuloRepo);
+  const articuloCtrl = new ArticuloController(articuloService);
   try{
     const response = await articuloCtrl.buscarMarcas(req,res);
     res.status(200).send(response);
@@ -73,6 +93,9 @@ router.get('/marcas', async (req, res) => {
 });
 
 router.get('/categorias', async (req, res) => {
+  const articuloRepo = new ArticuloMongo();
+  const articuloService = new ArticuloService(articuloRepo);
+  const articuloCtrl = new ArticuloController(articuloService);
   try{
     const response = await articuloCtrl.buscarCategorias(req,res);
     res.status(200).send(response);
@@ -82,6 +105,9 @@ router.get('/categorias', async (req, res) => {
 });
 
 router.get('/tipotalles', async (req, res) => {
+  const articuloRepo = new ArticuloMongo();
+  const articuloService = new ArticuloService(articuloRepo);
+  const articuloCtrl = new ArticuloController(articuloService);
   try{
     const response = await articuloCtrl.buscarTiposTalle(req,res);
     res.status(200).send(response);
@@ -91,8 +117,23 @@ router.get('/tipotalles', async (req, res) => {
 });
 
 router.post('/modificar/articulo', async (req, res) => {
+  const articuloRepo = new ArticuloMongo();
+  const articuloService = new ArticuloService(articuloRepo);
+  const articuloCtrl = new ArticuloController(articuloService);
   try{
     const response = await articuloCtrl.modificarArticulo(req,res);
+    res.status(200).send(response);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error interno del servidor' });
+  }
+});
+
+router.post('/modificar/articulo', async (req, res) => {
+  const articuloRepo = new ArticuloMongo();
+  const articuloService = new ArticuloService(articuloRepo);
+  const articuloCtrl = new ArticuloController(articuloService);
+  try{
+    const response = await articuloCtrl.eliminarArticulo(req,res);
     res.status(200).send(response);
   } catch (error) {
     res.status(500).json({ mensaje: 'Error interno del servidor' });
