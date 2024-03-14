@@ -13,18 +13,21 @@ import { IUsuarioRepository } from "../domain/interfaces/IUsuarioRepository";
 import { ConexionAfipService } from "./ConexionAfipService";
 import { TarjetaData } from "../domain/entities/TarjetaData";
 import { ConexionTarjetaService } from "./ConexionSistTarjetaService";
+import { IConexionAfipService } from "../domain/interfaces/IConexionAfipService";
 
 export class VentaService {
   private clienteRepository: IClienteRepository;
   private articuloRepository: IArticuloRepository;
   private ventaRepository : IVentaRepository;
+  private conexionAfipService : IConexionAfipService;
   private usuarioRepository : IUsuarioRepository;
 
-  constructor(usuarioRepo : IUsuarioRepository, clienteRepository: IClienteRepository, articuloRepository : IArticuloRepository, ventaRepo : IVentaRepository) {
+  constructor(usuarioRepo : IUsuarioRepository, clienteRepository: IClienteRepository, articuloRepository : IArticuloRepository, ventaRepo : IVentaRepository, conexionAfip : IConexionAfipService) {
     this.clienteRepository = clienteRepository;
     this.articuloRepository = articuloRepository;
     this.ventaRepository = ventaRepo;
     this.usuarioRepository = usuarioRepo;
+    this.conexionAfipService = conexionAfip;
   }
 
 
@@ -36,10 +39,16 @@ export class VentaService {
 
       if(cliente && sesion){
 
-        const afip = new ConexionAfipService()
+        const token = await this.conexionAfipService.solicitarToken();
+        const numeros = await this.conexionAfipService.solicitarUltimoComprobante(token);
 
-        const token = await afip.solicitarToken(sesion);
-        await afip.solicitarUltimoComprobante(sesion);
+        if(!token || !numeros){
+          return null;
+        }
+
+        sesion.setTokenAfip(token);
+        sesion.setNumeroComprobanteA(numeros.A);
+        sesion.setNumeroComprobanteB(numeros.B);
 
         const usuario = sesion.getUsuario()
         const puntoDeVenta = sesion.getPuntoDeVenta();
@@ -137,9 +146,8 @@ export class VentaService {
         console.error('venta o sesion no encontrada', ventaId , sesionId, venta ,sesion)
         return null;
       }
-      const afip = new ConexionAfipService();
 
-      const response = await afip.solicitarCae(venta, sesion);
+      const response = await this.conexionAfipService.solicitarCae(venta, sesion);
 
       const nuevaVenta = await this.crearComprobante(response.cae, venta);
 
@@ -150,11 +158,12 @@ export class VentaService {
     }
   }
 
-  public async crearComprobante(cae : string, venta : Venta){
+  private async crearComprobante(cae : string, venta : Venta){
 
     const ldv = venta.getLineaDeVenta();
     const cliente = venta.getCliente();
     const tipo = venta.getTipoDeComprobante()
+    
 
     const comprobante = new Comprobante(tipo,ldv,cliente,cae);
     venta.setComprobante(comprobante);
@@ -254,6 +263,7 @@ export class VentaService {
         const sistemaTarjeta = new ConexionTarjetaService()
         const response = await sistemaTarjeta.confirmarPago(sesion.getTokenTarjeta(),venta.getMonto(),venta.getId())
 
+        console.log('Pago con tarjeta confirmado')
         return response;
       }catch(error){
         console.error('error al confirmar pago con tarjeta');

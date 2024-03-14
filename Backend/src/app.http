@@ -99,6 +99,15 @@ Content-Type: application/json
     "venta" : "65f1bfe5da8d6202882ca1e7"
 }
 
+### Cerrar Sesion
+POST {{BASE_API}}/cerrarSesion
+Content-Type: application/json
+
+{
+    "sesion" : "65f1bf47da8d6202882ca1c9",
+    "venta" : "65f1bfe5da8d6202882ca1e7"
+}
+
 ### Crear Articulo
 PUT {{BASE_API}}/articulo
 Content-Type: application/json

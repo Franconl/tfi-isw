@@ -11,7 +11,7 @@ import { Sesion } from "../domain/entities/Sesion";
 export class ConexionAfipService {
     private url : string = "http://istp1service.azurewebsites.net/LoginService.svc";
 
-    public async solicitarToken(sesion : Sesion) : Promise<any> {
+    public async solicitarToken() : Promise<any> {
         const headers = {
             'Content-Type': 'text/xml;charset=UTF-8',
             'SOAPAction': 'http://ISTP1.Service.Contracts.Service/ILoginService/SolicitarAutorizacion',
@@ -36,7 +36,6 @@ export class ConexionAfipService {
                 const token = result['a:Token'][0];
                 
                 if(token){
-                    this.setToken(token , sesion);
                     console.log('token solicitado');
                     return token;
                 }throw Error;
@@ -48,8 +47,8 @@ export class ConexionAfipService {
 
         }
     
-    public async solicitarUltimoComprobante(sesion : Sesion) : Promise<any> {
-      const token = sesion.getTokenAfip();
+    public async solicitarUltimoComprobante(token : string) : Promise<any> {
+
         const headers = {
             'Content-Type' : 'text/xml;charset=UTF-8',
             'SOAPAction': 'http://ISTP1.Service.Contracts.Service/ILoginService/SolicitarUltimosComprobantes'
@@ -76,15 +75,18 @@ export class ConexionAfipService {
             for (const comprobante of comprobantes) {
                 const descripcion = comprobante['a:Descripcion'][0];
                 const numero = comprobante['a:Numero'][0];
-                
+                var numeroA = 0;
+                var numeroB = 0;
                 if(numero){
                     if (descripcion === 'Factura A') {
-                        sesion.setNumeroComprobanteA(parseInt(numero) + 1);
+                        var numeroA = (parseInt(numero) + 1);
                     } else if (descripcion === 'Factura B') {
-                        sesion.setNumeroComprobanteB(parseInt(numero) + 1);
+                        var numeroB = (parseInt(numero) + 1);
                     }
 
                     console.log('Ultimos comprobantes solicitados')
+
+                    return {A : numeroA,B : numeroB}
                 }
                 
             }
@@ -160,7 +162,6 @@ export class ConexionAfipService {
           const tipoComprobante = data['s:Envelope']['s:Body'][0]['SolicitarCaeResponse'][0]['SolicitarCaeResult'][0]['a:TipoComprobante'][0];
           if(estado == 'Aprobada' || estado == 'AprobadaParcialmente'){
               console.log('Venta Aprobada por AFIP');
-              this.setUltimosComprobantes(tipoComprobante, sesion);
           }
           return {cae,error,estado,tipoComprobante}
       }catch(error){
@@ -229,21 +230,4 @@ export class ConexionAfipService {
       return venta.getMonto() > 0;
     }
 
-    public setToken(token : string, sesion : Sesion){
-      sesion.setTokenAfip(token);
-    }
-
-    public incrementarNumComprobante(tipo : string, sesion : Sesion){
-      if(tipo == 'FacturaA'){
-        sesion.setNumeroComprobanteA(+1);
-      }else sesion.setNumeroComprobanteB(+1);
-    }
-
-    setUltimosComprobantes(tipoDeComprobante : string, sesion : Sesion){
-      if(tipoDeComprobante == 'FacturaA'){
-        sesion.setNumeroComprobanteA(sesion.getNumeroComprobanteA() + 1);
-      }else{
-        sesion.setNumeroComprobanteB(sesion.getNumeroComprobanteB() + 1);
-      }
-    }
 }
