@@ -13,18 +13,32 @@ import { Sucursal } from "../src/domain/entities/Sucursal";
 import { IConexionAfipService } from "../src/domain/interfaces/IConexionAfipService";
 import { Venta } from "../src/domain/entities/Venta";
 import { Comprobante } from "../src/domain/entities/Comprobante";
+import { Inventario } from "../src/domain/entities/Inventario";
+import { Talle } from "../src/domain/entities/Talle";
+import { TipoDeTalle } from "../src/domain/entities/TipoDeTalle";
+import { Color } from "../src/domain/entities/Color";
+import { Articulo } from "../src/domain/entities/Articulo";
+import { Categoria } from "../src/domain/entities/Categoria";
+import { Marca } from "../src/domain/entities/Marca";
+import { LineaDeVenta } from "../src/domain/entities/LineaDeVenta";
 
 const clienteMock: Cliente = new Cliente('Lionel','Messi','453134','messileo@gmail.com','calle 123',CondicionTributaria.CONSUMIDOR_FINAL, {dni : 34232312});
 const usuarioMock = new Usuario('123124','Jose','Jose','user');
 const sucursalMock = new Sucursal('1234', 'Centro', 'San miguel de Tucuman', 423452);
 const puntoDeVentaMock = new PuntoDeVenta('1234', 1 , sucursalMock, 'diponible');
 const sesionMock = new Sesion(usuarioMock,puntoDeVentaMock);
-
 const tipoDeComprobanteMock = new TipoDeComprobante('1234','FacturaB',CondicionTributaria.RESPONSABLE_INSCRIPTO,[CondicionTributaria.MONOTRIBUTO,CondicionTributaria.CONSUMIDOR_FINAL])
 const mockVenta = new Venta(usuarioMock,clienteMock,puntoDeVentaMock);
+const tipoTalleMock = new TipoDeTalle('1234','EU');
+const talleMock = new Talle('45',tipoTalleMock);
+const colorMock = new Color('1234','rojo');
+const categoriaMock = new Categoria('1234','remera');
+const marcaMock = new Marca('1234','nike');
+const articuloMock = new Articulo('1234','remera algodon',2000,20,tipoTalleMock,categoriaMock,marcaMock,'disponible');
+const inventarioMock = new Inventario('1234',45,articuloMock,talleMock,colorMock,sucursalMock);
 
 mockVenta.setTipoDeComprobante(tipoDeComprobanteMock);
-// Mocks de los repositorios
+// Mocks de los repositorios y servicio
 const mockClienteRepository: IClienteRepository = {
   crearCliente: jest.fn(),
   obtenerClientePorDni: jest.fn().mockResolvedValue(clienteMock),
@@ -33,7 +47,7 @@ const mockClienteRepository: IClienteRepository = {
 };
 
 const mockArticuloRepository: IArticuloRepository = {
-    busarInventarioId: jest.fn(),
+    busarInventarioId: jest.fn().mockResolvedValue(inventarioMock),
     buscarArticulo: jest.fn(),
     buscarInventario: jest.fn(),
     crear: jest.fn(),
@@ -66,7 +80,7 @@ const mockVentaRepository: IVentaRepository = {
     obtenerTipoComprobante: jest.fn().mockResolvedValue(tipoDeComprobanteMock),
     insertNuevaVenta: jest.fn((criterios:{venta : Venta}) => Promise.resolve(criterios.venta)),
     obtenerVenta: jest.fn().mockResolvedValue(mockVenta),
-    insertLineaDeVenta: jest.fn(),
+    insertLineaDeVenta: jest.fn((ldv,ventaid) => Promise.resolve([ldv])),
     setCliente: jest.fn(),
 };
 
@@ -104,7 +118,8 @@ describe('VentaService', () => {
 
 
   describe('crearNuevaVenta', () => {
-    test('debería crear una nueva venta correctamente', async () => {
+
+    test('deberia crearse una nueva venta y solicitar token y ultimos comprobantes correctamente', async () => {
 
       const result = await ventaService.crearNuevaVenta(1234,'1234');
 
@@ -125,7 +140,19 @@ describe('VentaService', () => {
   });
 
   describe('finalizarSeleccion', () =>{
-    test('finalizar la seleccion de articulos correctamente', async () => {
+
+    test('No deberia crearse el comprobante al no recibir CAE', async () => {
+      mockConexionAfipService.solicitarCae = jest.fn().mockResolvedValue(null);
+
+      const result = await ventaService.finalizarSeleccion('','');
+
+      expect(result).toBeNull();
+      expect(result?.nuevaVenta.getComprobante()).toBeUndefined();
+      expect(mockVentaRepository.insertComprobante).toBeCalledTimes(0);
+    });
+
+    test('deberia finalizar la seleccion de articulos correctamente y crear comprobante', async () => {
+      mockConexionAfipService.solicitarCae = jest.fn().mockResolvedValue({cae : '1223234'});
 
       const result = await ventaService.finalizarSeleccion('asdas','asdasd');
 
@@ -136,9 +163,41 @@ describe('VentaService', () => {
       expect(result?.nuevaVenta.getComprobante().getTipo().getDescripcion()).toBe('FacturaB');
       expect(result?.nuevaVenta.getComprobante().getCae()).toBe('1223234');
       expect(result?.nuevaVenta.getComprobante().getCliente()).toBe(clienteMock);
-      expect(mockVentaRepository.insertComprobante).toBeCalled()
+      expect(mockVentaRepository.insertComprobante).toBeCalled();
 
     });
+
+  });
+
+  describe('seleccionarInventario', () =>{
+
+    test('No deberia seleccionarse inventario al obtener un inventario con cantidad menor a la requerida' , async () =>{
+
+      const result = await ventaService.seleccionarInventario('1234', 50, '1234');
+      expect(result).toBeNull();
+      expect(mockVentaRepository.insertLineaDeVenta).toBeCalledTimes(0);
+
+    })
+
+    test('Deberia seleccionarse el inventario correctamente y devolver la linea de venta', async () => {
+
+      const result = await ventaService.seleccionarInventario('1234',2,'1234');
+
+      if(!result){
+        throw console.error('error al obtener ldv');
+      }
+
+      expect(result).toBeDefined();
+
+      result.forEach(ldv => {
+        expect(ldv.getCantidad()).toBe(2);
+        expect(ldv.getPrecioUnitario()).toBe(articuloMock.obtenerMontoTotal());
+        expect(ldv.getInventario()).toBe(inventarioMock);
+      });
+
+      expect(mockVentaRepository.insertLineaDeVenta).toBeCalled();
+    });
+
   });
 
 });

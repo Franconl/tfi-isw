@@ -6,6 +6,7 @@ import { ArticuloMongo } from '../../repositroy/articulo.mongo';
 import { ClienteMongo } from '../../repositroy/cliente.mongo';
 import { VentaMongo } from '../../repositroy/venta.mongo';
 import { UsuarioMongo } from '../../repositroy/usuario.mongo';
+import { ConexionAfipService } from '../../aplication/ConexionAfipService';
 
 const router = express.Router();
 
@@ -15,9 +16,10 @@ const router = express.Router();
       const ArticuloRepo = new ArticuloMongo();
       const ClienteRepo = new ClienteMongo();
       const ventaRepo = new VentaMongo();
-      const usuarioRepo = new UsuarioMongo()
-      var ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo);
-      var ventaCtrl = new VentaServiceController(ventaService);
+      const usuarioRepo = new UsuarioMongo();
+      const afipService = new ConexionAfipService();
+      const ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo, afipService);
+      const ventaCtrl = new VentaServiceController(ventaService);
 
       const venta = await ventaCtrl.nuevaVenta(req, res);
 
@@ -35,8 +37,9 @@ const router = express.Router();
         const ClienteRepo = new ClienteMongo();
         const ventaRepo = new VentaMongo();
         const usuarioRepo = new UsuarioMongo()
-        var ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo);
-        var ventaCtrl = new VentaServiceController(ventaService);
+        const afipService = new ConexionAfipService();
+        const ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo, afipService);
+        const ventaCtrl = new VentaServiceController(ventaService);
         const response = await ventaCtrl.crearCliente(req,res);
         res.status(200).send(response);
     }catch(error) {
@@ -51,8 +54,9 @@ const router = express.Router();
         const ClienteRepo = new ClienteMongo();
         const ventaRepo = new VentaMongo();
         const usuarioRepo = new UsuarioMongo()
-        var ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo);
-        var ventaCtrl = new VentaServiceController(ventaService);
+        const afipService = new ConexionAfipService();
+        const ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo, afipService);
+        const ventaCtrl = new VentaServiceController(ventaService);
         const response = await ventaCtrl.seleccionarInventario(req,res);
         res.status(200).send(response);
     }catch(error) {
@@ -68,8 +72,9 @@ const router = express.Router();
         const ClienteRepo = new ClienteMongo();
         const ventaRepo = new VentaMongo();
         const usuarioRepo = new UsuarioMongo()
-        var ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo);
-        var ventaCtrl = new VentaServiceController(ventaService);
+        const afipService = new ConexionAfipService();
+        const ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo, afipService);
+        const ventaCtrl = new VentaServiceController(ventaService);
         const response = await ventaCtrl.setCliente(req,res);
         res.status(200).send(response);
     }catch(error) {
@@ -84,8 +89,9 @@ router.post('/venta/pago', async (req, res) => {
       const ClienteRepo = new ClienteMongo();
       const ventaRepo = new VentaMongo();
       const usuarioRepo = new UsuarioMongo()
-      var ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo);
-      var ventaCtrl = new VentaServiceController(ventaService);
+      const afipService = new ConexionAfipService();
+      const ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo, afipService);
+      const ventaCtrl = new VentaServiceController(ventaService);
       const response = await ventaCtrl.setPago(req,res);
       res.status(200).send(response);
   }catch(error) {
@@ -100,8 +106,9 @@ router.post('/venta/pago', async (req, res) => {
       const ClienteRepo = new ClienteMongo();
       const ventaRepo = new VentaMongo();
       const usuarioRepo = new UsuarioMongo()
-      var ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo);
-      var ventaCtrl = new VentaServiceController(ventaService);
+      const afipService = new ConexionAfipService();
+      const ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo, afipService);
+      const ventaCtrl = new VentaServiceController(ventaService);
       const response = await ventaCtrl.solicitarToken(req,res);
       res.status(200).send(response);
     }catch(error) {
@@ -117,8 +124,9 @@ router.post('/venta/pago', async (req, res) => {
       const ClienteRepo = new ClienteMongo();
       const ventaRepo = new VentaMongo();
       const usuarioRepo = new UsuarioMongo()
-      var ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo);
-      var ventaCtrl = new VentaServiceController(ventaService);
+      const afipService = new ConexionAfipService();
+      const ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo, afipService);
+      const ventaCtrl = new VentaServiceController(ventaService);
       const response = await ventaCtrl.confirmarPagoTarjeta(req,res);
       res.status(200).send(response);
     }catch(error) {
@@ -134,8 +142,9 @@ router.post('/venta/pago', async (req, res) => {
       const ClienteRepo = new ClienteMongo();
       const ventaRepo = new VentaMongo();
       const usuarioRepo = new UsuarioMongo()
-      var ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo);
-      var ventaCtrl = new VentaServiceController(ventaService);
+      const afipService = new ConexionAfipService();
+      const ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo, afipService);
+      const ventaCtrl = new VentaServiceController(ventaService);
       const response = await ventaCtrl.finalizarSeleccion(req,res) ;
       res.status(200).send(response);
     }catch(error) {
@@ -149,8 +158,9 @@ router.post('/venta/finalizar' , async (req,res) =>{
         const ClienteRepo = new ClienteMongo();
         const ventaRepo = new VentaMongo();
         const usuarioRepo = new UsuarioMongo()
-        var ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo);
-        var ventaCtrl = new VentaServiceController(ventaService);
+        const afipService = new ConexionAfipService();
+        const ventaService : VentaService = new VentaService(usuarioRepo,ClienteRepo, ArticuloRepo, ventaRepo, afipService);
+        const ventaCtrl = new VentaServiceController(ventaService);
         const response = await ventaCtrl.finalizarVenta(req,res);
         res.status(200).send(response);
     }catch(error) {

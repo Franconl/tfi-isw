@@ -102,8 +102,8 @@ export class VentaService {
     try{
        
       const inventario = await this.articuloRepository.busarInventarioId({id});
-
-      if(inventario && inventario.getCantidad() > 0){
+      
+      if(inventario && inventario.getCantidad() > 0 && inventario.getCantidad() >= cantidad){
 
 
           inventario.setCantidad(inventario.getCantidad() - cantidad);
@@ -113,9 +113,9 @@ export class VentaService {
           const precio = inventario.getArticulo().obtenerMontoTotal();
 
           const lineadeVenta = new LineaDeVenta(inventario, cantidad, precio);
-
+          
           const ldv = await this.ventaRepository.insertLineaDeVenta(lineadeVenta,ventaId);
-
+        
           return ldv;
 
       }else{
@@ -149,12 +149,17 @@ export class VentaService {
 
       const response = await this.conexionAfipService.solicitarCae(venta, sesion);
 
+      if(!response.cae || !response){
+        return null;
+      }
+      
       const nuevaVenta = await this.crearComprobante(response.cae, venta);
 
       return {response, nuevaVenta};
 
     }catch(error){
       console.error('error al solicitar cae y crear comprobante')
+      return null;
     }
   }
 
